@@ -1,0 +1,34 @@
+{
+  "name": "@lanstar/z-router",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "homepage": "https://github.com/xLanStar/z-router#readme",
+  "bugs": {
+    "url": "https://github.com/xLanStar/z-router/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xLanStar/z-router.git"
+  },
+  "license": "MIT",
+  "author": "Lanstar <danny95624268@gmail.com>",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "prepublishOnly": "pnpm run build"
+  },
+  "packageManager": "pnpm@10.23.0",
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "tsup": "^8.5.1"
+  }
+}
