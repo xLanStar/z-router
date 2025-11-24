@@ -11,13 +11,13 @@ importers:
       react:
         specifier: ^19.2.0
         version: 19.2.0
-      tsup:
-        specifier: ^8.5.1
-        version: 8.5.1(typescript@5.9.3)
     devDependencies:
       '@types/react':
         specifier: ^19.2.7
         version: 19.2.7
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(typescript@5.9.3)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
