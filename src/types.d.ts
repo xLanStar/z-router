@@ -1,5 +1,3 @@
-import type { Pathname } from "@/lib/router";
-
 export interface Route {
   id?: string;
   pathname?: string;
@@ -15,7 +13,7 @@ export interface RootRoute extends Route {
 
 export interface Location {
   index: number;
-  pathname: Pathname;
+  pathname: string;
   params: any;
   query: any;
   state?: Map<string, any>;
