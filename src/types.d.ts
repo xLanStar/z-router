@@ -10,7 +10,6 @@ export interface Route {
 
 export interface Location {
   index: number;
-  // href: string; // TODO: consider adding href back
   pathname: string;
   search: Record<string, string>;
   state?: Map<string, any>;
@@ -52,11 +51,3 @@ export type BackOptions = TransitionOptions & {
 export type ForwardOptions = TransitionOptions & {
   depth?: number;
 };
-
-export class RedirectError extends Error {
-  options: { to: string; replace?: boolean };
-  constructor(options: { to: string; replace?: boolean }) {
-    super();
-    this.options = options;
-  }
-}
