@@ -14,18 +14,18 @@ export const rootRoute: Route = {
       component: MainLayout,
       children: [
         {
-          id: "home",
+          name: "home",
           component: HomePage,
         },
         {
-          id: "settings",
+          name: "settings",
           pathname: "settings",
           component: SettingsPage,
         },
       ],
     },
     {
-      id: "login",
+      name: "login",
       pathname: "login",
       component: () => <div>Login Page</div>,
     },
