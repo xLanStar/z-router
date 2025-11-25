@@ -7,7 +7,12 @@ export const redirect = (options: { to: string; replace?: boolean }) => {
   return new Error("", { cause: options });
 };
 
-export const matchUrl = (
+/**
+ * @param pattern pathname pattern like `/users/:id`. Leading and trailing slashes are optional.
+ * @param url URL to match against the pattern. Can be href or pathname with query string.
+ * @returns extracted params and query if matched, otherwise null
+ */
+export const matchPattern = (
   pattern: string,
   url: string
 ): { params: Record<string, string>; query: Record<string, string> } | null => {
@@ -68,9 +73,12 @@ export const matchUrl = (
 };
 
 export const matchRoute = (route: Route, url: string): RouteMatch => {
-  const _matchRoute = (matches: Route[], route: Route): RouteMatch | null => {
-    if (route.children && route.children.length > 0) {
-      for (const childRoute of route.children) {
+  const _matchRoute = (
+    matches: Route[],
+    { children }: Route
+  ): RouteMatch | null => {
+    if (children && children.length > 0) {
+      for (const childRoute of children) {
         const matchesResult = _matchRoute([...matches, childRoute], childRoute);
         if (matchesResult) {
           return matchesResult;
@@ -79,7 +87,7 @@ export const matchRoute = (route: Route, url: string): RouteMatch => {
       return null;
     }
 
-    const result = matchUrl(buildPathnameFromMatches(matches), url);
+    const result = matchPattern(buildPathnameFromMatches(matches), url);
     return result ? { matches, ...result } : null;
   };
 
