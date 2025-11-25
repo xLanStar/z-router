@@ -1,33 +1,16 @@
 import { useEffect, useState } from "react";
 
-import { useMatches } from "@/hooks/useMatches.js";
-import { useRoute } from "@/hooks/useRoute.js";
 import { useRouter } from "@/hooks/useRouter.js";
-import type { RootRoute } from "@/types.js";
+import type { Route } from "@/types.js";
 
-import { LocationProvider } from "./locationProvider.js";
-import { RouteComponent } from "./routeComponent.js";
-import { RouteProvider } from "./routeProvider.js";
-
-export const PageRenderer = () => {
-  const route = useRoute();
-  const matches = useMatches();
-  if (!matches || matches.length === 0) {
-    const NotFoundComponent = route.notFoundComponent!;
-    return <NotFoundComponent />;
-  }
-  let content: React.ReactNode = null;
-  for (let i = matches.length - 1; i >= 0; i--) {
-    const route = matches[i];
-    content = <RouteComponent route={route}>{content}</RouteComponent>;
-  }
-  return content;
-};
+import { RootRouteContext } from "@/context/routes-context.js";
+import { LocationProvider } from "./location-provider.js";
+import { PageRenderer } from "./page-renderer.js";
 
 const StackComponent = () => {
   const {
     history,
-    currentLocationIndex,
+    location,
     canGoBack,
     canGoForward,
     isTransitioning,
@@ -36,6 +19,7 @@ const StackComponent = () => {
     back,
     forward,
   } = useRouter();
+  const currentLocationIndex = location?.index;
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -50,6 +34,8 @@ const StackComponent = () => {
       setIsTransitionStarted(false);
     }, transitionDuration);
   }, [isTransitioning, transitioningToIndex]);
+
+  if (currentLocationIndex === undefined) return;
 
   const reset = () => {
     setIsDragging(false);
@@ -94,21 +80,42 @@ const StackComponent = () => {
   };
 
   return (
-    <div className="relative inset-0 h-full w-full overflow-hidden">
-      {currentLocationIndex >= 1 && (
-        <div className="absolute inset-0 -z-10">
-          <LocationProvider location={history.at(currentLocationIndex - 1)!}>
-            <PageRenderer key={currentLocationIndex - 1} />
-          </LocationProvider>
-        </div>
-      )}
+    <div
+      style={{
+        position: "relative",
+        inset: 0,
+        height: "100%",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
+      {currentLocationIndex >= 1 &&
+        ((isDragging && dragOffset > 0) ||
+          (isTransitioning &&
+            transitioningToIndex &&
+            transitioningToIndex < currentLocationIndex)) && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: -10,
+            }}
+          >
+            <LocationProvider location={history.at(currentLocationIndex - 1)!}>
+              <PageRenderer key={currentLocationIndex - 1} />
+            </LocationProvider>
+          </div>
+        )}
       <div
         key={currentLocationIndex}
-        className="bg-background absolute inset-0 overflow-hidden"
         style={{
+          background: "white",
+          position: "absolute",
+          inset: 0,
+          overflow: "hidden",
           transform:
             isTransitioning &&
-            transitioningToIndex !== null &&
+            transitioningToIndex &&
             transitioningToIndex < currentLocationIndex
               ? `translateX(100%)`
               : isDragging && dragOffset > 0 && !isCanceling
@@ -117,7 +124,7 @@ const StackComponent = () => {
           transition:
             isCanceling ||
             (isTransitioning &&
-              transitioningToIndex !== null &&
+              transitioningToIndex &&
               transitioningToIndex < currentLocationIndex)
               ? `transform ${transitionDuration}ms ease-out`
               : "",
@@ -130,18 +137,21 @@ const StackComponent = () => {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <LocationProvider location={history.at(currentLocationIndex)!}>
-          <PageRenderer key={currentLocationIndex} />
-        </LocationProvider>
+        <PageRenderer />
       </div>
       {((isDragging && dragOffset < 0) ||
         (isTransitioning &&
-          transitioningToIndex !== null &&
+          transitioningToIndex &&
           currentLocationIndex < transitioningToIndex)) && (
         <div
           key={transitioningToIndex}
-          className="bg-background absolute inset-0 z-10 overflow-hidden transition-transform ease-in"
           style={{
+            background: "white",
+            position: "absolute",
+            inset: 0,
+            zIndex: 10,
+            overflow: "hidden",
+            transition: "transform ease-in",
             transform: isTransitionStarted
               ? `translateX(0px)`
               : isDragging && !isCanceling
@@ -168,10 +178,8 @@ const StackComponent = () => {
   );
 };
 
-export const Stack = ({ rootRoute }: { rootRoute: RootRoute }) => {
-  return (
-    <RouteProvider rootRoute={rootRoute}>
-      <StackComponent />
-    </RouteProvider>
-  );
-};
+export const Stack = ({ rootRoute }: { rootRoute: Route }) => (
+  <RootRouteContext.Provider value={rootRoute}>
+    <StackComponent />
+  </RootRouteContext.Provider>
+);

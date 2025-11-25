@@ -2,28 +2,35 @@ export interface Route {
   id?: string;
   pathname?: string;
   beforeLoad?: ({ location }: { location: Location }) => Promise<void>;
-  component?: React.ComponentType<{ children?: React.ReactNode }>;
   pendingComponent?: React.ComponentType;
-  children?: Route[];
-}
-
-export interface RootRoute extends Route {
+  component?: React.ComponentType<{ children?: React.ReactNode }>;
   notFoundComponent?: React.ComponentType;
+  children?: Route[];
 }
 
 export interface Location {
   index: number;
+  // href: string; // TODO: consider adding href back
   pathname: string;
-  params: any;
-  query: any;
+  search: Record<string, string>;
   state?: Map<string, any>;
 }
 
+export interface RouteMatch {
+  matches: Route[];
+  params: Record<string, string>;
+  query: Record<string, string>;
+}
+
 export interface RouterOptions {
-  defaultViewTransition?: (
+  defaultUseTransition?: (
     fromLocation: Location | undefined,
     toLocation: Location | undefined
   ) => boolean;
+  /**
+   * @default 300
+   */
+  defaultTransitionDuration?: number;
 }
 
 export interface TransitionOptions {
@@ -32,25 +39,19 @@ export interface TransitionOptions {
   onFinish?: () => void;
 }
 
-export type NavigateOptions = Partial<
-  Pick<Location, "params" | "query" | "state">
-> & {
+export type NavigateOptions = Partial<Pick<Location, "params" | "search">> & {
   to: string;
   replace?: boolean;
   updateHistory?: boolean;
 } & TransitionOptions;
 
-export type BackOptions =
-  | (TransitionOptions & {
-      depth?: number;
-    })
-  | void;
+export type BackOptions = TransitionOptions & {
+  depth?: number;
+};
 
-export type ForwardOptions =
-  | (TransitionOptions & {
-      depth?: number;
-    })
-  | void;
+export type ForwardOptions = TransitionOptions & {
+  depth?: number;
+};
 
 export class RedirectError extends Error {
   options: { to: string; replace?: boolean };

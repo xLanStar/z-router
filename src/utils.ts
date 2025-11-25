@@ -1,4 +1,5 @@
-import type { Location, RootRoute, Route, RouterOptions } from "./types.js";
+import { DefaultRouterOptions } from "./constants.js";
+import type { Location, Route, RouteMatch, RouterOptions } from "./types.js";
 
 export const DefaultTransitionDuration = 300;
 
@@ -66,23 +67,9 @@ export const matchUrl = (
   }
 };
 
-export const matchRoute = (
-  rootRoute: RootRoute,
-  url: string
-): {
-  matches: Route[];
-  params: Record<string, string>;
-  query: Record<string, string>;
-} | null => {
-  const _matchRoute = (
-    matches: Route[],
-    route: Route
-  ): {
-    matches: Route[];
-    params: Record<string, string>;
-    query: Record<string, string>;
-  } | null => {
-    if (route.children) {
+export const matchRoute = (route: Route, url: string): RouteMatch => {
+  const _matchRoute = (matches: Route[], route: Route): RouteMatch | null => {
+    if (route.children && route.children.length > 0) {
       for (const childRoute of route.children) {
         const matchesResult = _matchRoute([...matches, childRoute], childRoute);
         if (matchesResult) {
@@ -92,34 +79,41 @@ export const matchRoute = (
       return null;
     }
 
-    let pattern = "";
-    for (const match of matches) {
-      if (match.pathname === undefined) continue;
-      pattern += `/${match.pathname}`;
-    }
-    const result = matchUrl(pattern, url);
-    if (result) {
-      return { matches, ...result };
-    }
-    return null;
+    const result = matchUrl(buildPathnameFromMatches(matches), url);
+    return result ? { matches, ...result } : null;
   };
 
-  return _matchRoute([], rootRoute);
+  return (
+    _matchRoute([], route) || {
+      matches: [],
+      params: {},
+      query: {},
+    }
+  );
+};
+
+export const buildPathnameFromMatches = (matches: Route[]): string => {
+  let cleanedPathnames: string[] = []; // pathnames without leading/trailing slashes
+  for (const match of matches) {
+    if (match.pathname === undefined) continue;
+    cleanedPathnames.push(match.pathname.replaceAll(/^\/|\/$/g, ""));
+  }
+  return "/" + cleanedPathnames.join("/");
 };
 
 export const parseLocationFromHref = (
-  rootRoute: RootRoute,
   to: string
-): Pick<Location, "pathname" | "params" | "query"> | null => {
-  const result = matchRoute(rootRoute, to);
-  if (!result) return null;
+): Pick<Location, "pathname" | "search"> => {
+  const url = new URL(to);
   return {
-    pathname: to,
-    params: result.params,
-    query: result.query,
+    pathname: url.pathname,
+    search: Object.fromEntries(url.searchParams),
   };
 };
 
-export const createRouter = (options: RouterOptions): RouterOptions => {
-  return options;
-};
+export const createRouterOptions = (
+  options?: RouterOptions
+): RouterOptions => ({
+  ...DefaultRouterOptions,
+  ...options,
+});

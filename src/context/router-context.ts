@@ -14,20 +14,19 @@ export interface RouterContextType {
 
   // Navigation State
   history: Location[];
-  currentLocationIndex: number;
-  location: Location | null;
+  location?: Location;
   canGoBack: boolean;
   canGoForward: boolean;
 
   // Transition state
   isTransitioning: boolean;
   transitionDuration: number;
-  transitioningToIndex: number | null;
+  transitioningToIndex?: number;
 
   // Actions
   navigate: (options: NavigateOptions) => void;
-  back: (options: BackOptions) => void;
-  forward: (options: ForwardOptions) => void;
+  back: (options?: BackOptions) => void;
+  forward: (options?: ForwardOptions) => void;
 }
 
 export const RouterContext = createContext<RouterContextType | null>(null);
