@@ -19,17 +19,9 @@ export const Outlet = () => {
     if (route?.beforeLoad) {
       route
         .beforeLoad({ location })
-        .catch((error: unknown) => {
-          if (
-            error instanceof Error &&
-            typeof error.cause === "object" &&
-            error.cause !== null &&
-            "to" in error.cause
-          ) {
-            router.navigate({
-              to: (error.cause as any).to,
-              replace: (error.cause as any).replace,
-            });
+        .catch(({ cause }: Error) => {
+          if ("to" in (cause as any)) {
+            router.navigate(cause as any);
           }
         })
         .finally(() => setPending(false));
