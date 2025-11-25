@@ -11,7 +11,7 @@ export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
   const routeMatch = useRouteMatch();
   const route = useRoute();
 
-  const pendingStateKey = `_Z.${depth}.pending`;
+  const pendingStateKey = `_Z.${route.id}.pending`;
 
   const [pending, setPending] = useState(
     !!route?.beforeLoad && route?.getState(pendingStateKey) !== false
