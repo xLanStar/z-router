@@ -8,4 +8,5 @@ export default defineConfig({
   sourcemap: true,
   skipNodeModulesBundle: true,
   clean: true,
+  minify: true,
 });
