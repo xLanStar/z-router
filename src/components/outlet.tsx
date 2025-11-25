@@ -51,9 +51,9 @@ export const Outlet = () => {
   }
 
   const Component = route.component;
-  return Component ? (
+  return (
     <OutletProvider depth={depth + 1}>
-      <Component />
+      {Component ? <Component /> : <Outlet />}
     </OutletProvider>
-  ) : null;
+  );
 };

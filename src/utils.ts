@@ -84,7 +84,7 @@ export const matchRoute = (route: Route, url: string): RouteMatch => {
   };
 
   return (
-    _matchRoute([], route) || {
+    _matchRoute([route], route) || {
       matches: [],
       params: {},
       query: {},
