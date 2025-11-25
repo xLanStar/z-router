@@ -35,7 +35,14 @@ export const LocationProvider = ({
   );
   return (
     <LocationContext.Provider
-      value={{ ...location, getState, setState, deleteState }}
+      value={{
+        ...location,
+        canGoBack: location.index > 0,
+        canGoForward: location.index < router.history.length - 1,
+        getState,
+        setState,
+        deleteState,
+      }}
       {...props}
     />
   );
