@@ -27,6 +27,9 @@ export interface RouterContextType {
   navigate: (options: NavigateOptions) => void;
   back: (options?: BackOptions) => void;
   forward: (options?: ForwardOptions) => void;
+
+  // Low-level state action
+  setLocationState: (index: number, state: Record<string, any>) => void;
 }
 
 export const RouterContext = createContext<RouterContextType | null>(null);

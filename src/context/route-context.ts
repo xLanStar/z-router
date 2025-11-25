@@ -1,4 +1,9 @@
-import type { Route } from "@/types.js";
+import type { ParsedRoute } from "@/types.js";
 import { createContext } from "react";
 
-export const RouteContext = createContext<Route | null>(null);
+export interface RouteContextType extends ParsedRoute {
+  getState: (key: string) => any;
+  setState: (key: string, value: any) => void;
+}
+
+export const RouteContext = createContext<RouteContextType | null>(null);

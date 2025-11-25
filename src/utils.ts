@@ -1,5 +1,11 @@
 import { DefaultRouterOptions } from "./constants.js";
-import type { Location, Route, RouteMatch, RouterOptions } from "./types.js";
+import type {
+  Location,
+  ParsedRoute,
+  Route,
+  RouteMatch,
+  RouterOptions,
+} from "./types.js";
 
 export const DefaultTransitionDuration = 300;
 
@@ -72,10 +78,10 @@ export const matchPattern = (
   }
 };
 
-export const matchRoute = (route: Route, url: string): RouteMatch => {
+export const matchRoute = (route: ParsedRoute, url: string): RouteMatch => {
   const _matchRoute = (
-    matches: Route[],
-    { children }: Route
+    matches: ParsedRoute[],
+    { children }: ParsedRoute
   ): RouteMatch | null => {
     if (children && children.length > 0) {
       for (const childRoute of children) {
@@ -109,15 +115,12 @@ export const buildPathnameFromMatches = (matches: Route[]): string => {
   return "/" + cleanedPathnames.join("/");
 };
 
-export const parseLocationFromHref = (
-  to: string
-): Pick<Location, "pathname" | "search"> => {
-  const url = new URL(to);
-  return {
-    pathname: url.pathname,
-    search: Object.fromEntries(url.searchParams),
-  };
-};
+export const parseLocation = (location: globalThis.Location): Location => ({
+  index: 0,
+  state: {},
+  pathname: location.pathname,
+  search: Object.fromEntries(new URLSearchParams(location.search)),
+});
 
 export const createRouterOptions = (
   options?: RouterOptions
@@ -125,3 +128,22 @@ export const createRouterOptions = (
   ...DefaultRouterOptions,
   ...options,
 });
+
+export const parseRoute = (route: Route): ParsedRoute => {
+  const parseRouteRecursive = (route: Route, parentId: string): ParsedRoute => {
+    const id =
+      route.name ??
+      (route.pathname
+        ? `${parentId}/${route.pathname.replaceAll(/^\/|\/$/g, "")}`
+        : parentId);
+
+    const parsedRoute: ParsedRoute = {
+      ...route,
+      id,
+      children: route.children?.map((child) => parseRouteRecursive(child, id)),
+    };
+
+    return parsedRoute;
+  };
+  return parseRouteRecursive(route, "");
+};

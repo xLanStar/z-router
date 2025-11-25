@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "@/hooks/useRouter.js";
 import type { Route } from "@/types.js";
 
-import { RootRouteContext } from "@/context/routes-context.js";
 import { LocationProvider } from "./location-provider.js";
 import { PageRenderer } from "./page-renderer.js";
+import { RootRouteProvider } from "./root-route-provider.js";
 
 const StackComponent = () => {
   const {
@@ -92,7 +92,7 @@ const StackComponent = () => {
       {currentLocationIndex >= 1 &&
         ((isDragging && dragOffset > 0) ||
           (isTransitioning &&
-            transitioningToIndex &&
+            transitioningToIndex !== undefined &&
             transitioningToIndex < currentLocationIndex)) && (
           <div
             style={{
@@ -115,7 +115,7 @@ const StackComponent = () => {
           overflow: "hidden",
           transform:
             isTransitioning &&
-            transitioningToIndex &&
+            transitioningToIndex !== undefined &&
             transitioningToIndex < currentLocationIndex
               ? `translateX(100%)`
               : isDragging && dragOffset > 0 && !isCanceling
@@ -124,7 +124,7 @@ const StackComponent = () => {
           transition:
             isCanceling ||
             (isTransitioning &&
-              transitioningToIndex &&
+              transitioningToIndex !== undefined &&
               transitioningToIndex < currentLocationIndex)
               ? `transform ${transitionDuration}ms ease-out`
               : "",
@@ -141,7 +141,7 @@ const StackComponent = () => {
       </div>
       {((isDragging && dragOffset < 0) ||
         (isTransitioning &&
-          transitioningToIndex &&
+          transitioningToIndex !== undefined &&
           currentLocationIndex < transitioningToIndex)) && (
         <div
           key={transitioningToIndex}
@@ -179,7 +179,7 @@ const StackComponent = () => {
 };
 
 export const Stack = ({ rootRoute }: { rootRoute: Route }) => (
-  <RootRouteContext.Provider value={rootRoute}>
+  <RootRouteProvider rootRoute={rootRoute}>
     <StackComponent />
-  </RootRouteContext.Provider>
+  </RootRouteProvider>
 );

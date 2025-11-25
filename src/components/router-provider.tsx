@@ -8,7 +8,7 @@ import type {
   NavigateOptions,
   RouterOptions,
 } from "@/types.js";
-import { DefaultTransitionDuration, parseLocationFromHref } from "@/utils.js";
+import { DefaultTransitionDuration, parseLocation } from "@/utils.js";
 import { LocationProvider } from "./location-provider.js";
 
 export const RouterProvider = ({
@@ -19,7 +19,7 @@ export const RouterProvider = ({
   children: React.ReactNode;
 }) => {
   const [history, setHistory] = useState<Location[]>([
-    { index: 0, ...parseLocationFromHref(window.location.href) },
+    parseLocation(window.location),
   ]);
   const [currentLocationIndex, setCurrentLocationIndex] = useState<number>(0);
   const location = history.at(currentLocationIndex)!;
@@ -36,9 +36,6 @@ export const RouterProvider = ({
       },
       ""
     );
-  }, []);
-
-  useEffect(() => {
     const handlePopState = ({ state }: PopStateEvent) => {
       setCurrentLocationIndex(state?.index ?? 0);
     };
@@ -47,7 +44,29 @@ export const RouterProvider = ({
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [history]);
+  }, [setCurrentLocationIndex]);
+
+  // Update location state
+  const setLocationState = useCallback(
+    (index: number, state: Record<string, any>) => {
+      setHistory((prevHistory) =>
+        prevHistory.map((location) =>
+          location.index === index ? { ...location, state } : location
+        )
+      );
+      if (index === currentLocationIndex) {
+        window.history.replaceState(
+          {
+            index,
+            ...state,
+          },
+          "",
+          location.pathname
+        );
+      }
+    },
+    [currentLocationIndex]
+  );
 
   const navigate = useCallback(
     ({
@@ -90,30 +109,21 @@ export const RouterProvider = ({
         pathname = to;
       }
 
-      const newLocation: Location = {
-        index,
-        search: {},
-        state: new Map(),
-        pathname,
-        ...locationOptions,
-      };
-      if (index === history.length) {
-        setHistory([...history, newLocation]);
-      } else {
-        setHistory((prevHistory) => {
-          const newHistory = [...prevHistory];
-          newHistory[index] = newLocation;
-          return newHistory.slice(0, currentLocationIndex + 2);
-        });
-      }
+      setHistory((prevHistory) => [
+        ...(index === history.length ? history : prevHistory.slice(0, index)),
+        {
+          index,
+          search: {},
+          state: {},
+          pathname,
+          ...locationOptions,
+        },
+      ]);
       if (
         !replace &&
         currentLocationIndex >= 0 &&
         (transition ??
-          options.defaultUseTransition?.(
-            history.at(currentLocationIndex),
-            history.at(index)
-          ))
+          options.defaultUseTransition?.(location, history.at(index)))
       ) {
         const currentDuration = duration ?? DefaultTransitionDuration;
         setIsTransitioning(true);
@@ -166,7 +176,7 @@ export const RouterProvider = ({
         currentLocationIndex > 0 &&
         (transition ??
           options.defaultUseTransition?.(
-            history.at(currentLocationIndex),
+            location,
             history.at(newLocationIndex)
           ))
       ) {
@@ -198,7 +208,7 @@ export const RouterProvider = ({
         newLocationIndex < history.length &&
         (transition ??
           options.defaultUseTransition?.(
-            history.at(currentLocationIndex),
+            location,
             history.at(newLocationIndex)
           ))
       ) {
@@ -239,6 +249,8 @@ export const RouterProvider = ({
         navigate,
         back,
         forward,
+
+        setLocationState,
       }}
     >
       <LocationProvider location={location} {...props} />

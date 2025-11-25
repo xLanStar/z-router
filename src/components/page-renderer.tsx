@@ -2,8 +2,8 @@ import { RouteMatchContext } from "@/context/route-match-context.js";
 import { useLocation } from "@/hooks/useLocation.js";
 import { useRootRoute } from "@/hooks/useRootRoute.js";
 import { matchRoute } from "@/utils.js";
-import { OutletProvider } from "./outlet-provider.js";
-import { Outlet } from "./outlet.js";
+import { RouteComponent } from "./route-component.js";
+import { RouteProvider } from "./route-provider.js";
 
 export const PageRenderer = () => {
   const rootRoute = useRootRoute();
@@ -11,9 +11,9 @@ export const PageRenderer = () => {
   const routeMatch = matchRoute(rootRoute, location.pathname);
   return (
     <RouteMatchContext.Provider value={routeMatch}>
-      <OutletProvider depth={0}>
-        <Outlet />
-      </OutletProvider>
+      <RouteProvider route={rootRoute}>
+        <RouteComponent />
+      </RouteProvider>
     </RouteMatchContext.Provider>
   );
 };

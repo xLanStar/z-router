@@ -1,3 +1,3 @@
 import { createContext } from "react";
 
-export const OutletContext = createContext<number | null>(null);
+export const OutletContext = createContext<number>(0);

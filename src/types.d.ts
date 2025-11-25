@@ -1,5 +1,5 @@
 export interface Route {
-  id?: string;
+  name?: string;
   pathname?: string;
   beforeLoad?: ({ location }: { location: Location }) => Promise<void>;
   pendingComponent?: React.ComponentType;
@@ -8,15 +8,20 @@ export interface Route {
   children?: Route[];
 }
 
+export interface ParsedRoute extends Route {
+  id: string;
+  children?: ParsedRoute[];
+}
+
 export interface Location {
   index: number;
   pathname: string;
   search: Record<string, string>;
-  state?: Map<string, any>;
+  state: Record<string, any>;
 }
 
 export interface RouteMatch {
-  matches: Route[];
+  matches: ParsedRoute[];
   params: Record<string, string>;
   query: Record<string, string>;
 }
@@ -38,7 +43,7 @@ export interface TransitionOptions {
   onFinish?: () => void;
 }
 
-export type NavigateOptions = Partial<Pick<Location, "params" | "search">> & {
+export type NavigateOptions = {
   to: string;
   replace?: boolean;
   updateHistory?: boolean;
