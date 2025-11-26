@@ -7,7 +7,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "scan": "vite & react-scan http://localhost:5173"
   },
   "dependencies": {
     "@modastar/z-router": "link:..",
@@ -20,6 +21,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "react-scan": "^0.4.3",
     "vite": "^7.2.4"
   }
 }
