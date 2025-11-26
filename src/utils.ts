@@ -162,7 +162,7 @@ export const resolveRelativePathname = (
   pathname: string,
   to: string
 ): string => {
-  const currentPathSegments = pathname.split("/");
+  const currentPathSegments = pathname.split("/").filter(isPathSegmentValid);
   const toPathSegments = to.split("/").filter(isPathSegmentValid);
   for (const segment of toPathSegments) {
     if (segment === ".") {
