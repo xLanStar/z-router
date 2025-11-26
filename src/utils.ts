@@ -149,3 +149,29 @@ export const parseRoute = (route: Route): ParsedRoute => {
   };
   return parseRouteRecursive(route, "");
 };
+
+const isPathSegmentValid = (segment: string): boolean => segment.length > 0;
+
+/**
+ * Resolves a relative path against a base pathname.
+ * @param pathname The base pathname.
+ * @param to The relative path to resolve.
+ * @returns The resolved absolute pathname.
+ */
+export const resolveRelativePathname = (
+  pathname: string,
+  to: string
+): string => {
+  const currentPathSegments = pathname.split("/");
+  const toPathSegments = to.split("/").filter(isPathSegmentValid);
+  for (const segment of toPathSegments) {
+    if (segment === ".") {
+      continue;
+    } else if (segment === "..") {
+      currentPathSegments.pop();
+    } else {
+      currentPathSegments.push(segment);
+    }
+  }
+  return "/" + currentPathSegments.join("/");
+};

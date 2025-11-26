@@ -8,7 +8,7 @@ import type {
   NavigateOptions,
   RouterOptions,
 } from "@/types.js";
-import { parseLocation } from "@/utils.js";
+import { parseLocation, resolveRelativePathname } from "@/utils.js";
 import { LocationProvider } from "./location-provider.js";
 
 export const RouterProvider = ({
@@ -87,26 +87,9 @@ export const RouterProvider = ({
       const index = replace ? currentLocationIndex : currentLocationIndex + 1;
 
       // Resolve to with absolute or relative paths like ".." or "."
-      // TODO: Wrap into a utility function
-      let pathname: string;
-      if (to.startsWith("/")) {
-        pathname = to;
-      } else {
-        const currentPathSegments = location.pathname
-          .split("/")
-          .filter((seg) => seg.length > 0);
-        const toPathSegments = to.split("/").filter((seg) => seg.length > 0);
-        for (const segment of toPathSegments) {
-          if (segment === ".") {
-            continue;
-          } else if (segment === "..") {
-            currentPathSegments.pop();
-          } else {
-            currentPathSegments.push(segment);
-          }
-        }
-        pathname = "/" + currentPathSegments.join("/");
-      }
+      const pathname = to.startsWith("/")
+        ? to
+        : resolveRelativePathname(location.pathname, to);
       const state = {
         index,
       };
