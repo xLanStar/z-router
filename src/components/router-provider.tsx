@@ -25,15 +25,11 @@ export const RouterProvider = ({
   const location = history.at(currentLocationIndex)!;
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [transitionDuration, setTransitionDuration] = useState<number>(0);
-  const [transitioningToIndex, setTransitioningToIndex] = useState<number>();
+  const [transitioningToLocation, setTransitioningToLocation] =
+    useState<Location>();
 
   useEffect(() => {
-    window.history.replaceState(
-      {
-        index: 0,
-      },
-      ""
-    );
+    window.history.replaceState(history[0].state, "", history[0].pathname);
     const handlePopState = ({ state }: PopStateEvent) => {
       setCurrentLocationIndex(state?.index ?? 0);
     };
@@ -44,6 +40,23 @@ export const RouterProvider = ({
     };
   }, []);
 
+  const transitionTo = (
+    location: Location,
+    duration: number = options.defaultTransitionDuration,
+    callback?: () => void
+  ) => {
+    setIsTransitioning(true);
+    setTransitionDuration(duration);
+    setTransitioningToLocation(location);
+    setTimeout(() => {
+      setIsTransitioning(false);
+      setTransitioningToLocation(undefined);
+      // TODO: May can be deleted
+      setCurrentLocationIndex(location.index);
+      callback?.();
+    }, duration);
+  };
+
   // Update location state
   const setLocationState = useCallback(
     (index: number, state: Record<string, any>) => {
@@ -53,14 +66,7 @@ export const RouterProvider = ({
         )
       );
       if (index === currentLocationIndex) {
-        window.history.replaceState(
-          {
-            index,
-            ...state,
-          },
-          "",
-          location.pathname
-        );
+        window.history.replaceState(state, "", location.pathname);
       }
     },
     [currentLocationIndex]
@@ -72,7 +78,6 @@ export const RouterProvider = ({
       replace,
       transition,
       duration,
-      updateHistory = true,
       onFinish,
       ...locationOptions
     }: NavigateOptions) => {
@@ -81,86 +86,60 @@ export const RouterProvider = ({
       const index = replace ? currentLocationIndex : currentLocationIndex + 1;
 
       // Resolve to with absolute or relative paths like ".." or "."
+      // TODO: Wrap into a utility function
       let pathname: string;
-      if (to.startsWith(".")) {
+      if (to.startsWith("/")) {
+        pathname = to;
+      } else {
         const currentPathSegments = location.pathname
           .split("/")
           .filter((seg) => seg.length > 0);
         const toPathSegments = to.split("/").filter((seg) => seg.length > 0);
         for (const segment of toPathSegments) {
-          if (segment.startsWith(".")) {
-            if (segment === ".") {
-              continue;
-            } else if (segment === "..") {
-              currentPathSegments.pop();
-            } else {
-              throw new Error(
-                `Invalid relative path segment: ${segment} in ${to}`
-              );
-            }
-          } else if (segment.length > 0) {
+          if (segment === ".") {
+            continue;
+          } else if (segment === "..") {
+            currentPathSegments.pop();
+          } else {
             currentPathSegments.push(segment);
           }
         }
         pathname = "/" + currentPathSegments.join("/");
-      } else {
-        pathname = to;
       }
+      const state = {
+        index,
+      };
+      const newLocation = {
+        index,
+        search: {},
+        state,
+        pathname,
+        ...locationOptions,
+      };
 
-      setHistory((prevHistory) => [
-        ...(index === history.length ? history : prevHistory.slice(0, index)),
-        {
-          index,
-          search: {},
-          state: {},
-          pathname,
-          ...locationOptions,
-        },
-      ]);
-      if (
-        !replace &&
-        currentLocationIndex >= 0 &&
-        (transition ??
-          options.defaultUseTransition?.(location, history.at(index)))
-      ) {
-        const currentDuration = duration ?? options.defaultTransitionDuration;
-        setIsTransitioning(true);
-        setTransitionDuration(currentDuration);
-        setTransitioningToIndex(index);
-        setTimeout(() => {
-          setIsTransitioning(false);
-          setTransitioningToIndex(undefined);
+      const updateHistory = () => {
+        if (replace) {
+          setHistory((prevHistory) => [
+            ...prevHistory.slice(0, index),
+            newLocation,
+            ...prevHistory.slice(index + 1),
+          ]);
+          window.history.replaceState(state, "", pathname);
+        } else {
+          setHistory((prevHistory) => [
+            ...prevHistory.slice(0, index),
+            newLocation,
+          ]);
           setCurrentLocationIndex(index);
-          onFinish?.();
-          if (updateHistory) {
-            window.history.pushState(
-              {
-                index,
-              },
-              "",
-              to
-            );
-          }
-        }, currentDuration);
-      } else if (!replace) {
-        setCurrentLocationIndex(index);
-        if (updateHistory) {
-          window.history.pushState(
-            {
-              index,
-            },
-            "",
-            to
-          );
+          window.history.pushState(state, "", pathname);
         }
-      } else if (updateHistory) {
-        window.history.replaceState(
-          {
-            index,
-          },
-          "",
-          to
-        );
+        onFinish?.();
+      };
+
+      if (transition ?? options.defaultUseTransition?.(location, newLocation)) {
+        transitionTo(newLocation, duration, updateHistory);
+      } else {
+        updateHistory();
       }
     },
     [currentLocationIndex, history, isTransitioning, options]
@@ -169,62 +148,44 @@ export const RouterProvider = ({
   const back = useCallback(
     ({ transition, duration, onFinish, depth }: BackOptions = {}) => {
       if (currentLocationIndex === 0 || isTransitioning) return;
-      const newLocationIndex = currentLocationIndex - (depth ?? 1);
-      if (
-        currentLocationIndex > 0 &&
-        (transition ??
-          options.defaultUseTransition?.(
-            location,
-            history.at(newLocationIndex)
-          ))
-      ) {
-        const finalDuration = duration ?? options.defaultTransitionDuration;
-        setIsTransitioning(true);
-        setTransitionDuration(finalDuration);
-        setTransitioningToIndex(newLocationIndex);
-        setTimeout(() => {
-          setIsTransitioning(false);
-          setTransitioningToIndex(undefined);
-          setCurrentLocationIndex(newLocationIndex);
-          onFinish?.();
-          window.history.back();
-        }, finalDuration);
-      } else {
-        setCurrentLocationIndex(newLocationIndex);
+      const backDepth = depth ?? 1;
+      const newLocation = history.at(currentLocationIndex - backDepth);
+
+      const updateHistory = () => {
+        window.history.go(-backDepth);
         onFinish?.();
-        window.history.back();
+      };
+
+      if (
+        newLocation &&
+        (transition ?? options.defaultUseTransition?.(location, newLocation))
+      ) {
+        transitionTo(newLocation, duration, updateHistory);
+      } else {
+        updateHistory();
       }
     },
     [currentLocationIndex, history, isTransitioning, options]
   );
 
   const forward = useCallback(
-    ({ transition, duration, onFinish }: ForwardOptions = {}) => {
+    ({ transition, duration, depth, onFinish }: ForwardOptions = {}) => {
       if (currentLocationIndex + 1 >= history.length || isTransitioning) return;
-      const newLocationIndex = currentLocationIndex + 1;
-      if (
-        newLocationIndex < history.length &&
-        (transition ??
-          options.defaultUseTransition?.(
-            location,
-            history.at(newLocationIndex)
-          ))
-      ) {
-        const finalDuration = duration ?? options.defaultTransitionDuration;
-        setIsTransitioning(true);
-        setTransitionDuration(finalDuration);
-        setTransitioningToIndex(newLocationIndex);
-        setTimeout(() => {
-          setIsTransitioning(false);
-          setTransitioningToIndex(undefined);
-          setCurrentLocationIndex(newLocationIndex);
-          onFinish?.();
-          window.history.forward();
-        }, finalDuration);
-      } else {
-        setCurrentLocationIndex(newLocationIndex);
+      const forwardDepth = depth ?? 1;
+      const newLocation = history.at(currentLocationIndex + forwardDepth);
+
+      const updateHistory = () => {
+        window.history.go(forwardDepth);
         onFinish?.();
-        window.history.forward();
+      };
+
+      if (
+        newLocation &&
+        (transition ?? options.defaultUseTransition?.(location, newLocation))
+      ) {
+        transitionTo(newLocation, duration, updateHistory);
+      } else {
+        updateHistory();
       }
     },
     [currentLocationIndex, history, isTransitioning, options]
@@ -242,7 +203,7 @@ export const RouterProvider = ({
 
         isTransitioning,
         transitionDuration,
-        transitioningToIndex,
+        transitioningToLocation,
 
         navigate,
         back,

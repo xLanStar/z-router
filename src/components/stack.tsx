@@ -14,12 +14,13 @@ const StackComponent = () => {
     canGoBack,
     canGoForward,
     isTransitioning,
-    transitioningToIndex,
+    transitioningToLocation,
     transitionDuration,
     back,
     forward,
   } = useRouter();
   const currentLocationIndex = location?.index;
+  const transitioningToLocationIndex = transitioningToLocation?.index;
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -28,12 +29,12 @@ const StackComponent = () => {
   const [isTransitionStarted, setIsTransitionStarted] = useState(false);
 
   useEffect(() => {
-    if (!isTransitioning || transitioningToIndex === null) return;
+    if (!isTransitioning || !transitioningToLocation) return;
     setIsTransitionStarted(true);
     setTimeout(() => {
       setIsTransitionStarted(false);
     }, transitionDuration);
-  }, [isTransitioning, transitioningToIndex]);
+  }, [isTransitioning, transitioningToLocation]);
 
   if (currentLocationIndex === undefined) return;
 
@@ -92,8 +93,8 @@ const StackComponent = () => {
       {currentLocationIndex >= 1 &&
         ((isDragging && dragOffset > 0) ||
           (isTransitioning &&
-            transitioningToIndex !== undefined &&
-            transitioningToIndex < currentLocationIndex)) && (
+            transitioningToLocation &&
+            transitioningToLocation.index < currentLocationIndex)) && (
           <div
             style={{
               position: "absolute",
@@ -115,8 +116,8 @@ const StackComponent = () => {
           overflow: "hidden",
           transform:
             isTransitioning &&
-            transitioningToIndex !== undefined &&
-            transitioningToIndex < currentLocationIndex
+            transitioningToLocation &&
+            transitioningToLocation.index < currentLocationIndex
               ? `translateX(100%)`
               : isDragging && dragOffset > 0 && !isCanceling
               ? `translateX(${dragOffset}px)`
@@ -124,8 +125,8 @@ const StackComponent = () => {
           transition:
             isCanceling ||
             (isTransitioning &&
-              transitioningToIndex !== undefined &&
-              transitioningToIndex < currentLocationIndex)
+              transitioningToLocation &&
+              transitioningToLocation.index < currentLocationIndex)
               ? `transform ${transitionDuration}ms ease-out`
               : "",
           boxShadow:
@@ -141,10 +142,9 @@ const StackComponent = () => {
       </div>
       {((isDragging && dragOffset < 0) ||
         (isTransitioning &&
-          transitioningToIndex !== undefined &&
-          currentLocationIndex < transitioningToIndex)) && (
+          transitioningToLocation &&
+          currentLocationIndex <= transitioningToLocation.index)) && (
         <div
-          key={transitioningToIndex}
           style={{
             background: "white",
             position: "absolute",
@@ -154,9 +154,9 @@ const StackComponent = () => {
             transition: "transform ease-in",
             transform: isTransitionStarted
               ? `translateX(0px)`
-              : isDragging && !isCanceling
-              ? `translateX(${innerWidth + dragOffset}px)`
-              : "translateX(100%)",
+              : isTransitioning
+              ? "translateX(100%)"
+              : `translateX(${innerWidth + dragOffset}px)`,
             transitionDuration:
               isTransitioning || isCanceling
                 ? `${transitionDuration}ms`
@@ -165,12 +165,12 @@ const StackComponent = () => {
         >
           <LocationProvider
             location={
-              isDragging
-                ? history.at(currentLocationIndex + 1)!
-                : history.at(transitioningToIndex!)!
+              isTransitioning
+                ? transitioningToLocation!
+                : history.at(currentLocationIndex + 1)!
             }
           >
-            <PageRenderer key={transitioningToIndex} />
+            <PageRenderer key={transitioningToLocationIndex} />
           </LocationProvider>
         </div>
       )}

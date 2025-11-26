@@ -21,7 +21,7 @@ export interface RouterContextType {
   // Transition state
   isTransitioning: boolean;
   transitionDuration: number;
-  transitioningToIndex?: number;
+  transitioningToLocation?: Location;
 
   // Actions
   navigate: (options: NavigateOptions) => void;

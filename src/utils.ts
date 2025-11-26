@@ -117,7 +117,9 @@ export const buildPathnameFromMatches = (matches: Route[]): string => {
 
 export const parseLocation = (location: globalThis.Location): Location => ({
   index: 0,
-  state: {},
+  state: {
+    index: 0,
+  },
   pathname: location.pathname,
   search: Object.fromEntries(new URLSearchParams(location.search)),
 });
