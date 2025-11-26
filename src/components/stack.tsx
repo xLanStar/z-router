@@ -79,7 +79,9 @@ const StackComponent = () => {
     }
     if (!draggedLeft && offset < 0) setDraggedLeft(true);
     if (!draggedRight && offset > 0) setDraggedRight(true);
-    setDragOffset(Math.min(innerWidth, offset));
+    setDragOffset(
+      Math.max(Math.min(offset, window.innerWidth), -window.innerWidth)
+    );
   };
 
   const handleTouchEnd = () => {
