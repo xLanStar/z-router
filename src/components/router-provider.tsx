@@ -29,16 +29,19 @@ export const RouterProvider = ({
     useState<Location>();
 
   useEffect(() => {
-    window.history.replaceState(history[0].state, "", history[0].pathname);
+    window.history.replaceState(location.state, "", location.pathname);
+  }, []);
+
+  useEffect(() => {
     const handlePopState = ({ state }: PopStateEvent) => {
-      setCurrentLocationIndex(state?.index ?? 0);
+      setCurrentLocationIndex(state?.index);
     };
 
     addEventListener("popstate", handlePopState);
     return () => {
       removeEventListener("popstate", handlePopState);
     };
-  }, []);
+  }, [currentLocationIndex]);
 
   const transitionTo = (
     location: Location,
