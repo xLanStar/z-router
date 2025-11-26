@@ -18,14 +18,14 @@ export const RouteProvider = ({
 
   const getState = useCallback(
     (key: string) => getRouteState(route.id, key),
-    [getRouteState]
+    [getRouteState, route.id]
   );
 
   const setState = useCallback(
     (key: string, value: any) => {
       setRouteState(route.id, key, value);
     },
-    [setRouteState]
+    [setRouteState, route.id]
   );
 
   return (

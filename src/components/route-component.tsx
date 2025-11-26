@@ -21,7 +21,6 @@ export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
     if (!route || depth >= routeMatch.matches.length) {
       return;
     }
-    // TODO: push location still loading. Maybe store state in route () instead of location
     if (pending && route?.beforeLoad) {
       route.setState(pendingStateKey, true);
       route

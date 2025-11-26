@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useRouter } from "@/hooks/useRouter.js";
 import type { Route } from "@/types.js";
@@ -7,7 +7,9 @@ import { LocationProvider } from "./location-provider.js";
 import { PageRenderer } from "./page-renderer.js";
 import { RootRouteProvider } from "./root-route-provider.js";
 
-const StackComponent = () => {
+type StackComponentProps = React.ComponentPropsWithoutRef<"div">;
+
+const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
   const {
     history,
     location,
@@ -19,8 +21,7 @@ const StackComponent = () => {
     back,
     forward,
   } = useRouter();
-  const currentLocationIndex = location?.index;
-  const transitioningToLocationIndex = transitioningToLocation?.index;
+  const currentLocationIndex = location.index;
 
   const isTouching = useRef(false);
   const startX = useRef(0);
@@ -38,7 +39,7 @@ const StackComponent = () => {
     setTimeout(() => {
       setIsTransitionStarted(false);
     }, transitionDuration);
-  }, [isTransitioning, transitioningToLocation]);
+  }, [isTransitioning, transitioningToLocation, transitionDuration]);
 
   if (currentLocationIndex === undefined) return;
 
@@ -84,44 +85,48 @@ const StackComponent = () => {
     );
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     isTouching.current = false;
     if (!isDragging) return;
 
+    const options = {
+      onFinish: reset,
+    };
     if (dragOffset > innerWidth * 0.3 && canGoBack) {
-      back({
-        onFinish: reset,
-      });
+      back(options);
     } else if (dragOffset < -innerWidth * 0.3 && canGoForward) {
-      forward({
-        onFinish: reset,
-      });
+      forward(options);
     } else {
       setIsCanceling(true);
       setTimeout(reset, transitionDuration);
     }
-  };
+  }, [
+    back,
+    forward,
+    isDragging,
+    dragOffset,
+    canGoBack,
+    canGoForward,
+    transitionDuration,
+  ]);
 
   return (
     <div
       style={{
         position: "relative",
-        inset: 0,
-        height: "100%",
-        width: "100%",
         overflow: "hidden",
+        ...style,
       }}
+      {...props}
     >
       {currentLocationIndex >= 1 &&
         ((isDragging && draggedRight) ||
           (isTransitioning &&
-            transitioningToLocation &&
-            transitioningToLocation.index < currentLocationIndex)) && (
+            transitioningToLocation!.index < currentLocationIndex)) && (
           <div
             style={{
               position: "absolute",
               inset: 0,
-              zIndex: -10,
             }}
           >
             <LocationProvider location={history.at(currentLocationIndex - 1)!}>
@@ -135,11 +140,9 @@ const StackComponent = () => {
           background: "white",
           position: "absolute",
           inset: 0,
-          overflow: "hidden",
           transform:
             isTransitioning &&
-            transitioningToLocation &&
-            transitioningToLocation.index < currentLocationIndex
+            transitioningToLocation!.index < currentLocationIndex
               ? `translateX(100%)`
               : isDragging && dragOffset > 0 && !isCanceling
               ? `translateX(${dragOffset}px)`
@@ -147,14 +150,9 @@ const StackComponent = () => {
           transition:
             isCanceling ||
             (isTransitioning &&
-              transitioningToLocation &&
-              transitioningToLocation.index < currentLocationIndex)
+              transitioningToLocation!.index < currentLocationIndex)
               ? `transform ${transitionDuration}ms ease-out`
               : "",
-          boxShadow:
-            isDragging && dragOffset > 0
-              ? "-4px 0 8px rgba(0,0,0,0.1)"
-              : "none",
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -165,25 +163,22 @@ const StackComponent = () => {
 
       {((isDragging && draggedLeft) ||
         (isTransitioning &&
-          transitioningToLocation &&
-          currentLocationIndex <= transitioningToLocation.index)) && (
+          currentLocationIndex <= transitioningToLocation!.index)) && (
         <div
           style={{
             background: "white",
             position: "absolute",
             inset: 0,
-            zIndex: 10,
-            overflow: "hidden",
-            transition: "transform ease-in",
-            transform: isTransitionStarted
-              ? `translateX(0px)`
-              : isTransitioning || isCanceling
-              ? "translateX(100%)"
-              : `translateX(${innerWidth + dragOffset}px)`,
-            transitionDuration:
-              isTransitioning || isCanceling
-                ? `${transitionDuration}ms`
-                : "0ms",
+            transform: `translateX(${
+              isTransitionStarted
+                ? "0px"
+                : isTransitioning || isCanceling
+                ? "100%"
+                : `${innerWidth + dragOffset}px`
+            })`,
+            transition: `transform ${
+              isTransitioning || isCanceling ? transitionDuration : 0
+            }ms ease-in`,
           }}
         >
           <LocationProvider
@@ -193,7 +188,7 @@ const StackComponent = () => {
                 : history.at(currentLocationIndex + 1)!
             }
           >
-            <PageRenderer key={transitioningToLocationIndex} />
+            <PageRenderer key={transitioningToLocation?.index} />
           </LocationProvider>
         </div>
       )}
@@ -201,8 +196,12 @@ const StackComponent = () => {
   );
 };
 
-export const Stack = ({ rootRoute }: { rootRoute: Route }) => (
+export interface StackProps extends StackComponentProps {
+  rootRoute: Route;
+}
+
+export const Stack: React.FC<StackProps> = ({ rootRoute, ...props }) => (
   <RootRouteProvider rootRoute={rootRoute}>
-    <StackComponent />
+    <StackComponent {...props} />
   </RootRouteProvider>
 );

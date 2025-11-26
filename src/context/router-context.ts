@@ -14,7 +14,7 @@ export interface RouterContextType {
 
   // Navigation State
   history: Location[];
-  location?: Location;
+  location: Location;
   canGoBack: boolean;
   canGoForward: boolean;
 

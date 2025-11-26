@@ -1,0 +1,24 @@
+{
+  "plugins": [
+    "import",
+    "typescript",
+    "unicorn",
+    "vitest",
+    "oxc",
+    "eslint",
+    "react",
+    "react-perf"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/exhaustive-deps": "off"
+  }
+}

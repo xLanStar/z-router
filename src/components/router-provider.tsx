@@ -177,6 +177,7 @@ export const RouterProvider = ({
 
   return (
     <RouterContext.Provider
+      // oxlint-disable-next-line jsx-no-new-object-as-prop
       value={{
         options,
 
