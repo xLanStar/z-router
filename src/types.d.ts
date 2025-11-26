@@ -46,7 +46,6 @@ export interface TransitionOptions {
 export type NavigateOptions = {
   to: string;
   replace?: boolean;
-  updateHistory?: boolean;
 } & TransitionOptions;
 
 export type BackOptions = TransitionOptions & {
