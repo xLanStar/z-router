@@ -54,8 +54,6 @@ export const RouterProvider = ({
     setTimeout(() => {
       setIsTransitioning(false);
       setTransitioningToLocation(undefined);
-      // TODO: May can be deleted
-      setCurrentLocationIndex(location.index);
       callback?.();
     }, duration);
   };
