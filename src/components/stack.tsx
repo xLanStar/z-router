@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useRouter } from "@/hooks/useRouter.js";
 import type { Route } from "@/types.js";
@@ -22,8 +22,10 @@ const StackComponent = () => {
   const currentLocationIndex = location?.index;
   const transitioningToLocationIndex = transitioningToLocation?.index;
 
+  const isTouching = useRef(false);
+  const startX = useRef(0);
+  const startY = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isTransitionStarted, setIsTransitionStarted] = useState(false);
@@ -46,13 +48,24 @@ const StackComponent = () => {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (isTransitioning || (!canGoForward && !canGoBack)) return;
-    setIsDragging(true);
-    setStartX(e.touches[0].clientX);
+    isTouching.current = true;
+    startX.current = e.touches[0].clientX;
+    startY.current = e.touches[0].clientY;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const offset = e.touches[0].clientX - startX;
+    if (!isTouching.current) return;
+    // Skip vertical drag
+    const { clientX, clientY } = e.touches[0];
+    if (!isDragging && Math.abs(clientY - startY.current) > 30) {
+      isTouching.current = false;
+      return;
+    }
+    const offset = clientX - startX.current;
+    if (Math.abs(offset) < 10) return;
+    if (!isDragging) {
+      setIsDragging(true);
+    }
     if (
       (offset > 0 && currentLocationIndex === 0) ||
       (offset < 0 && currentLocationIndex + 1 === history.length)
@@ -64,6 +77,7 @@ const StackComponent = () => {
   };
 
   const handleTouchEnd = () => {
+    isTouching.current = false;
     if (!isDragging) return;
 
     if (dragOffset > innerWidth * 0.3 && canGoBack) {
@@ -140,6 +154,7 @@ const StackComponent = () => {
       >
         <PageRenderer />
       </div>
+
       {((isDragging && dragOffset < 0) ||
         (isTransitioning &&
           transitioningToLocation &&
