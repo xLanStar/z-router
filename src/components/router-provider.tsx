@@ -42,7 +42,7 @@ export const RouterProvider = ({
     return () => {
       removeEventListener("popstate", handlePopState);
     };
-  }, [setCurrentLocationIndex]);
+  }, []);
 
   // Update location state
   const setLocationState = useCallback(
