@@ -27,6 +27,8 @@ const StackComponent = () => {
   const startY = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
+  const [draggedLeft, setDraggedLeft] = useState(false);
+  const [draggedRight, setDraggedRight] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isTransitionStarted, setIsTransitionStarted] = useState(false);
 
@@ -43,6 +45,8 @@ const StackComponent = () => {
   const reset = () => {
     setIsDragging(false);
     setDragOffset(0);
+    setDraggedLeft(false);
+    setDraggedRight(false);
     setIsCanceling(false);
   };
 
@@ -73,6 +77,8 @@ const StackComponent = () => {
       setDragOffset(0);
       return;
     }
+    if (!draggedLeft && offset < 0) setDraggedLeft(true);
+    if (!draggedRight && offset > 0) setDraggedRight(true);
     setDragOffset(Math.min(innerWidth, offset));
   };
 
@@ -105,7 +111,7 @@ const StackComponent = () => {
       }}
     >
       {currentLocationIndex >= 1 &&
-        ((isDragging && dragOffset > 0) ||
+        ((isDragging && draggedRight) ||
           (isTransitioning &&
             transitioningToLocation &&
             transitioningToLocation.index < currentLocationIndex)) && (
@@ -155,7 +161,7 @@ const StackComponent = () => {
         <PageRenderer />
       </div>
 
-      {((isDragging && dragOffset < 0) ||
+      {((isDragging && draggedLeft) ||
         (isTransitioning &&
           transitioningToLocation &&
           currentLocationIndex <= transitioningToLocation.index)) && (
