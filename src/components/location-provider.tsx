@@ -1,49 +1,52 @@
 import { LocationContext } from "@/context/location-context.js";
 import { useRouter } from "@/hooks/useRouter.js";
 import type { Location } from "@/types.js";
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 
-export const LocationProvider = ({
-  location,
-  ...props
-}: {
-  location: Location;
-  children: React.ReactNode;
-}) => {
-  const router = useRouter();
-  const getState = useCallback(
-    (key: string) => {
-      return location.state[key];
-    },
-    [location]
-  );
-  const setState = useCallback(
-    (key: string, value: any) => {
-      router.setLocationState(location.index, {
-        ...location.state,
-        [key]: value,
-      });
-    },
-    [router, location]
-  );
-  const deleteState = useCallback(
-    (key: string) => {
-      delete location.state[key];
-      router.setLocationState(location.index, location.state);
-    },
-    [router, location]
-  );
-  return (
-    <LocationContext.Provider
-      value={{
-        ...location,
-        canGoBack: location.index > 0,
-        canGoForward: location.index < router.history.length - 1,
-        getState,
-        setState,
-        deleteState,
-      }}
-      {...props}
-    />
-  );
-};
+export const LocationProvider = memo(
+  ({
+    location,
+    ...props
+  }: {
+    location: Location;
+    children: React.ReactNode;
+  }) => {
+    const router = useRouter();
+    const getState = useCallback(
+      (key: string) => {
+        return location.state[key];
+      },
+      [location]
+    );
+    const setState = useCallback(
+      (key: string, value: any) => {
+        router.setLocationState(location.index, {
+          ...location.state,
+          [key]: value,
+        });
+      },
+      [router, location]
+    );
+    const deleteState = useCallback(
+      (key: string) => {
+        delete location.state[key];
+        router.setLocationState(location.index, location.state);
+      },
+      [router, location]
+    );
+    return (
+      <LocationContext.Provider
+        value={{
+          ...location,
+          canGoBack: location.index > 0,
+          canGoForward: location.index < router.history.length - 1,
+          getState,
+          setState,
+          deleteState,
+        }}
+        {...props}
+      />
+    );
+  },
+  (a, b) => a.location === b.location
+);
