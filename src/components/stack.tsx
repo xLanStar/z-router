@@ -177,7 +177,7 @@ const StackComponent = () => {
             transition: "transform ease-in",
             transform: isTransitionStarted
               ? `translateX(0px)`
-              : isTransitioning
+              : isTransitioning || isCanceling
               ? "translateX(100%)"
               : `translateX(${innerWidth + dragOffset}px)`,
             transitionDuration:
