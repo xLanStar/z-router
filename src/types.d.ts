@@ -27,14 +27,14 @@ export interface RouteMatch {
 }
 
 export interface RouterOptions {
-  defaultUseTransition?: (
+  defaultUseTransition: (
     fromLocation: Location | undefined,
     toLocation: Location | undefined
   ) => boolean;
   /**
    * @default 300
    */
-  defaultTransitionDuration?: number;
+  defaultTransitionDuration: number;
 }
 
 export interface TransitionOptions {

@@ -123,7 +123,7 @@ export const parseLocation = (location: globalThis.Location): Location => ({
 });
 
 export const createRouterOptions = (
-  options?: RouterOptions
+  options?: Partial<RouterOptions>
 ): RouterOptions => ({
   ...DefaultRouterOptions,
   ...options,

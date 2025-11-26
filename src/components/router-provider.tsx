@@ -8,7 +8,7 @@ import type {
   NavigateOptions,
   RouterOptions,
 } from "@/types.js";
-import { DefaultTransitionDuration, parseLocation } from "@/utils.js";
+import { parseLocation } from "@/utils.js";
 import { LocationProvider } from "./location-provider.js";
 
 export const RouterProvider = ({
@@ -24,9 +24,7 @@ export const RouterProvider = ({
   const [currentLocationIndex, setCurrentLocationIndex] = useState<number>(0);
   const location = history.at(currentLocationIndex)!;
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
-  const [transitionDuration, setTransitionDuration] = useState<number>(
-    DefaultTransitionDuration
-  );
+  const [transitionDuration, setTransitionDuration] = useState<number>(0);
   const [transitioningToIndex, setTransitioningToIndex] = useState<number>();
 
   useEffect(() => {
@@ -125,7 +123,7 @@ export const RouterProvider = ({
         (transition ??
           options.defaultUseTransition?.(location, history.at(index)))
       ) {
-        const currentDuration = duration ?? DefaultTransitionDuration;
+        const currentDuration = duration ?? options.defaultTransitionDuration;
         setIsTransitioning(true);
         setTransitionDuration(currentDuration);
         setTransitioningToIndex(index);
@@ -180,7 +178,7 @@ export const RouterProvider = ({
             history.at(newLocationIndex)
           ))
       ) {
-        const finalDuration = duration ?? DefaultTransitionDuration;
+        const finalDuration = duration ?? options.defaultTransitionDuration;
         setIsTransitioning(true);
         setTransitionDuration(finalDuration);
         setTransitioningToIndex(newLocationIndex);
@@ -212,7 +210,7 @@ export const RouterProvider = ({
             history.at(newLocationIndex)
           ))
       ) {
-        const finalDuration = duration ?? DefaultTransitionDuration;
+        const finalDuration = duration ?? options.defaultTransitionDuration;
         setIsTransitioning(true);
         setTransitionDuration(finalDuration);
         setTransitioningToIndex(newLocationIndex);
