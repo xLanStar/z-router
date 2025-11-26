@@ -14,20 +14,18 @@ export const RouteProvider = ({
     return <RouteContext.Provider value={null} {...props} />;
   }
 
-  const rootRoute = useRootRoute();
+  const { getRouteState, setRouteState } = useRootRoute();
 
   const getState = useCallback(
-    (key: string) => {
-      return rootRoute.getRouteState(route.id, key);
-    },
-    [rootRoute.getRouteState]
+    (key: string) => getRouteState(route.id, key),
+    [getRouteState]
   );
 
   const setState = useCallback(
     (key: string, value: any) => {
-      rootRoute.setRouteState(route.id, key, value);
+      setRouteState(route.id, key, value);
     },
-    [rootRoute.setRouteState]
+    [setRouteState]
   );
 
   return (
