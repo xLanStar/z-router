@@ -8,7 +8,7 @@ export const MainLayout: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col">
       <div className="p-3 bg-gray-200">
-        Z-Router Example - {router.location?.index}
+        Z-Router Example - {location?.index}
       </div>
       <div className="flex-1 p-3 flex flex-col gap-2">
         <div className="flex gap-2">
