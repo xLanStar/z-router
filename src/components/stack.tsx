@@ -59,17 +59,17 @@ const StackComponent = () => {
       setDragOffset(0);
       return;
     }
-    setDragOffset(Math.min(window.innerWidth, offset));
+    setDragOffset(Math.min(innerWidth, offset));
   };
 
   const handleTouchEnd = () => {
     if (!isDragging) return;
 
-    if (dragOffset > window.innerWidth * 0.3 && canGoBack) {
+    if (dragOffset > innerWidth * 0.3 && canGoBack) {
       back({
         onFinish: reset,
       });
-    } else if (dragOffset < -window.innerWidth * 0.3 && canGoForward) {
+    } else if (dragOffset < -innerWidth * 0.3 && canGoForward) {
       forward({
         onFinish: reset,
       });
@@ -155,7 +155,7 @@ const StackComponent = () => {
             transform: isTransitionStarted
               ? `translateX(0px)`
               : isDragging && !isCanceling
-              ? `translateX(${window.innerWidth + dragOffset}px)`
+              ? `translateX(${innerWidth + dragOffset}px)`
               : "translateX(100%)",
             transitionDuration:
               isTransitioning || isCanceling

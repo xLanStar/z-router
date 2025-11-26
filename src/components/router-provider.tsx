@@ -38,9 +38,9 @@ export const RouterProvider = ({
       setCurrentLocationIndex(state?.index ?? 0);
     };
 
-    window.addEventListener("popstate", handlePopState);
+    addEventListener("popstate", handlePopState);
     return () => {
-      window.removeEventListener("popstate", handlePopState);
+      removeEventListener("popstate", handlePopState);
     };
   }, [setCurrentLocationIndex]);
 
