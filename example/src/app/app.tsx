@@ -34,8 +34,8 @@ export const rootRoute: Route = {
 
 export const App = () => {
   return (
-    <div className="h-screen w-screen overflow-hidden">
-      <Stack rootRoute={rootRoute} />
+    <div className="h-screen w-screen">
+      <Stack rootRoute={rootRoute} className="w-full h-full" />
     </div>
   );
 };
