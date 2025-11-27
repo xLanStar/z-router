@@ -1,10 +1,11 @@
 import { createContext } from "react";
 
 import type {
-  BackOptions,
-  ForwardOptions,
+  BackActionOptions,
+  ForwardActionOptions,
   Location,
-  NavigateOptions,
+  NavigateActionOptions,
+  NavigationOptions,
   RouterOptions,
 } from "@/types.js";
 
@@ -23,10 +24,13 @@ export interface RouterContextType {
   transitionDuration: number;
   transitioningToLocation?: Location;
 
-  // Actions
-  navigate: (options: NavigateOptions) => void;
-  back: (options?: BackOptions) => void;
-  forward: (options?: ForwardOptions) => void;
+  // Utilities
+  buildLocation: (to: NavigationOptions) => Location;
+
+  // Navigation Actions
+  navigate: (options: NavigateActionOptions) => void;
+  back: (options?: BackActionOptions) => void;
+  forward: (options?: ForwardActionOptions) => void;
 
   // Low-level state action
   setLocationState: (index: number, state: Record<string, any>) => void;

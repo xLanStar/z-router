@@ -2,10 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 
 import { RouterContext } from "@/context/router-context.js";
 import type {
-  BackOptions,
-  ForwardOptions,
+  BackActionOptions,
+  ForwardActionOptions,
   Location,
-  NavigateOptions,
+  NavigateActionOptions,
+  NavigationOptions,
   RouterOptions,
 } from "@/types.js";
 import { parseLocation, resolveRelativePathname } from "@/utils.js";
@@ -43,6 +44,26 @@ export const RouterProvider = ({
     };
   }, [currentLocationIndex]);
 
+  // Utilities
+  const buildLocation = ({ to, replace }: NavigationOptions): Location => {
+    const index = replace ? currentLocationIndex : currentLocationIndex + 1;
+
+    // Resolve to with absolute or relative paths like ".." or "."
+    const pathname = to.startsWith("/")
+      ? to
+      : resolveRelativePathname(location.pathname, to);
+    const state = {
+      index,
+    };
+    return {
+      index,
+      search: {},
+      state,
+      pathname,
+    };
+  };
+
+  // Transition helper
   const transitionTo = (
     location: Location,
     duration: number = options.defaultTransitionDuration,
@@ -58,21 +79,7 @@ export const RouterProvider = ({
     }, duration);
   };
 
-  // Update location state
-  const setLocationState = useCallback(
-    (index: number, state: Record<string, any>) => {
-      setHistory((prevHistory) =>
-        prevHistory.map((location) =>
-          location.index === index ? { ...location, state } : location
-        )
-      );
-      if (index === currentLocationIndex) {
-        window.history.replaceState(state, "", location.pathname);
-      }
-    },
-    [currentLocationIndex]
-  );
-
+  // Navigation actions
   const navigate = useCallback(
     ({
       to,
@@ -80,26 +87,11 @@ export const RouterProvider = ({
       transition,
       duration,
       onFinish,
-      ...locationOptions
-    }: NavigateOptions) => {
+    }: NavigateActionOptions) => {
       if (isTransitioning) return;
 
       const index = replace ? currentLocationIndex : currentLocationIndex + 1;
-
-      // Resolve to with absolute or relative paths like ".." or "."
-      const pathname = to.startsWith("/")
-        ? to
-        : resolveRelativePathname(location.pathname, to);
-      const state = {
-        index,
-      };
-      const newLocation = {
-        index,
-        search: {},
-        state,
-        pathname,
-        ...locationOptions,
-      };
+      const newLocation = buildLocation({ to, replace });
 
       const updateHistory = () => {
         if (replace) {
@@ -108,14 +100,18 @@ export const RouterProvider = ({
             newLocation,
             ...prevHistory.slice(index + 1),
           ]);
-          window.history.replaceState(state, "", pathname);
+          window.history.replaceState(
+            newLocation.state,
+            "",
+            newLocation.pathname
+          );
         } else {
           setHistory((prevHistory) => [
             ...prevHistory.slice(0, index),
             newLocation,
           ]);
           setCurrentLocationIndex(index);
-          window.history.pushState(state, "", pathname);
+          window.history.pushState(newLocation.state, "", newLocation.pathname);
         }
         onFinish?.();
       };
@@ -130,7 +126,7 @@ export const RouterProvider = ({
   );
 
   const back = useCallback(
-    ({ transition, duration, onFinish, depth }: BackOptions = {}) => {
+    ({ transition, duration, onFinish, depth }: BackActionOptions = {}) => {
       if (currentLocationIndex === 0 || isTransitioning) return;
       const backDepth = depth ?? 1;
       const newLocation = history.at(currentLocationIndex - backDepth);
@@ -153,7 +149,7 @@ export const RouterProvider = ({
   );
 
   const forward = useCallback(
-    ({ transition, duration, depth, onFinish }: ForwardOptions = {}) => {
+    ({ transition, duration, depth, onFinish }: ForwardActionOptions = {}) => {
       if (currentLocationIndex + 1 >= history.length || isTransitioning) return;
       const forwardDepth = depth ?? 1;
       const newLocation = history.at(currentLocationIndex + forwardDepth);
@@ -175,6 +171,21 @@ export const RouterProvider = ({
     [currentLocationIndex, history, isTransitioning, options]
   );
 
+  // Low-level state action
+  const setLocationState = useCallback(
+    (index: number, state: Record<string, any>) => {
+      setHistory((prevHistory) =>
+        prevHistory.map((location) =>
+          location.index === index ? { ...location, state } : location
+        )
+      );
+      if (index === currentLocationIndex) {
+        window.history.replaceState(state, "", location.pathname);
+      }
+    },
+    [currentLocationIndex]
+  );
+
   return (
     <RouterContext.Provider
       // oxlint-disable-next-line jsx-no-new-object-as-prop
@@ -189,6 +200,8 @@ export const RouterProvider = ({
         isTransitioning,
         transitionDuration,
         transitioningToLocation,
+
+        buildLocation,
 
         navigate,
         back,

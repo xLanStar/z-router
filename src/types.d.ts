@@ -43,15 +43,15 @@ export interface TransitionOptions {
   onFinish?: () => void;
 }
 
-export type NavigateOptions = {
+export interface NavigationOptions {
   to: string;
   replace?: boolean;
-} & TransitionOptions;
+}
 
-export type BackOptions = TransitionOptions & {
+export interface HistoryTraversalOptions {
   depth?: number;
-};
+}
 
-export type ForwardOptions = TransitionOptions & {
-  depth?: number;
-};
+export type NavigateActionOptions = TransitionOptions & NavigationOptions;
+export type BackActionOptions = TransitionOptions & HistoryTraversalOptions;
+export type ForwardActionOptions = TransitionOptions & HistoryTraversalOptions;

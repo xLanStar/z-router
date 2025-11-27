@@ -1,8 +1,9 @@
 import { useRouter } from "@/hooks/useRouter.js";
-import type { NavigateOptions } from "@/types.js";
+import type { NavigateActionOptions } from "@/types.js";
 import { memo } from "react";
 
-export type LinkProps = React.ComponentPropsWithoutRef<"a"> & NavigateOptions;
+export type LinkProps = React.ComponentPropsWithoutRef<"a"> &
+  NavigateActionOptions;
 
 export const Link: React.FC<LinkProps> = memo(
   ({ to, replace, transition, duration, onFinish, ...props }) => {
