@@ -1,5 +1,5 @@
 {
-  "name": "example",
+  "name": "z-router-example",
   "version": "1.0.0",
   "description": "",
   "license": "MIT",
@@ -11,8 +11,14 @@
     "scan": "vite & react-scan http://localhost:5173"
   },
   "dependencies": {
+    "@heroui/button": "^2.2.27",
+    "@heroui/link": "^2.2.23",
+    "@heroui/react": "^2.8.5",
+    "@heroui/system": "^2.4.23",
+    "@heroui/theme": "^2.4.23",
     "@modastar/z-router": "link:..",
     "@tailwindcss/vite": "^4.1.17",
+    "framer-motion": "^12.23.24",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.17"

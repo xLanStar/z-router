@@ -1,29 +1,37 @@
-import { Button } from "@/components/button";
-import { Outlet, useLocation, useRouter } from "@modastar/z-router";
-import React from "react";
+import { Button, Link } from "@heroui/react";
+import { Outlet, useRouteMatch } from "@modastar/z-router";
 
-export const MainLayout: React.FC = () => {
-  const router = useRouter();
-  const location = useLocation();
+export const MainLayout = () => {
+  const routeMatch = useRouteMatch();
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="p-3 bg-gray-200">
-        Z-Router Example - {location?.index}
+    <div className="flex flex-col gap-4">
+      {/* Tabs */}
+      <div className="flex gap-2">
+        <Button
+          as={Link}
+          href="/"
+          color={
+            routeMatch.matches.some((match) => match.name === "home-page")
+              ? "primary"
+              : "default"
+          }
+        >
+          Home
+        </Button>
+        <Button
+          as={Link}
+          href="/settings"
+          color={
+            routeMatch.matches.some((match) => match.name === "settings-page")
+              ? "primary"
+              : "default"
+          }
+        >
+          Settings
+        </Button>
       </div>
-      <div className="flex-1 p-3 flex flex-col gap-2">
-        <div className="flex gap-2">
-          <Button disabled={!location.canGoBack} onClick={() => router.back()}>
-            Back
-          </Button>
-          <Button
-            disabled={!location.canGoForward}
-            onClick={() => router.forward()}
-          >
-            Forward
-          </Button>
-        </div>
-        <Outlet />
-      </div>
+
+      <Outlet />
     </div>
   );
 };
