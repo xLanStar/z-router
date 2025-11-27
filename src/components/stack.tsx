@@ -169,6 +169,7 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
             background: "white",
             position: "absolute",
             inset: 0,
+            zIndex: 1,
             transform: `translateX(${
               isTransitionStarted
                 ? "0px"
