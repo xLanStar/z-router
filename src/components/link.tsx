@@ -4,16 +4,18 @@ import { memo } from "react";
 
 export type LinkProps = React.ComponentPropsWithoutRef<"a"> & NavigateOptions;
 
-export const Link: React.FC<LinkProps> = memo((props) => {
-  const router = useRouter();
-  return (
-    <a
-      href={props.to}
-      onClick={(e) => {
-        e.preventDefault();
-        router.navigate(props);
-      }}
-      {...props}
-    />
-  );
-});
+export const Link: React.FC<LinkProps> = memo(
+  ({ to, replace, transition, duration, onFinish, ...props }) => {
+    const router = useRouter();
+    return (
+      <a
+        {...props}
+        href={to}
+        onClick={(e) => {
+          e.preventDefault();
+          router.navigate({ to, replace, transition, duration, onFinish });
+        }}
+      />
+    );
+  }
+);
