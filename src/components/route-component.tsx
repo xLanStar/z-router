@@ -21,7 +21,11 @@ export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
     if (!route || depth >= routeMatch.matches.length) {
       return;
     }
-    if (pending && route?.beforeLoad) {
+    if (
+      pending &&
+      route?.beforeLoad &&
+      route.getState(pendingStateKey) !== true
+    ) {
       route.setState(pendingStateKey, true);
       route
         .beforeLoad({ location })
@@ -35,7 +39,7 @@ export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
           setPending(false);
         });
     }
-  }, []);
+  }, [route]);
 
   if (!route) {
     return null;
