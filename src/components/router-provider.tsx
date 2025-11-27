@@ -46,6 +46,7 @@ export const RouterProvider = ({
 
   // Utilities
   const buildLocation = ({ to, replace }: NavigationOptions): Location => {
+    if (!to) return location;
     const index = replace ? currentLocationIndex : currentLocationIndex + 1;
 
     // Resolve to with absolute or relative paths like ".." or "."
