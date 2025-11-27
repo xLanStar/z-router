@@ -1,6 +1,7 @@
 import { DefaultRouterOptions } from "./constants.js";
 import type {
   Location,
+  NavigateActionOptions,
   ParsedRoute,
   Route,
   RouteMatch,
@@ -9,7 +10,7 @@ import type {
 
 export const DefaultTransitionDuration = 300;
 
-export const redirect = (options: { to: string; replace?: boolean }) => {
+export const redirect = (options: NavigateActionOptions) => {
   return new Error("", { cause: options });
 };
 
