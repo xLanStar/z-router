@@ -45,25 +45,28 @@ export const RouterProvider = ({
   }, [currentLocationIndex]);
 
   // Utilities
-  const buildLocation = ({ to, replace }: NavigationOptions): Location => {
-    if (!to) return location;
-    const index = replace ? currentLocationIndex : currentLocationIndex + 1;
+  const buildLocation = useCallback(
+    ({ to, replace }: NavigationOptions): Location => {
+      if (!to) return location;
+      const index = replace ? currentLocationIndex : currentLocationIndex + 1;
 
-    // Resolve to with absolute or relative paths like ".." or "."
-    const pathname = to.startsWith("/")
-      ? to
-      : resolveRelativePathname(location.pathname, to);
-    const state = {
-      index,
-    };
-    return {
-      index,
-      href: origin + pathname,
-      search: {},
-      state,
-      pathname,
-    };
-  };
+      // Resolve to with absolute or relative paths like ".." or "."
+      const pathname = to.startsWith("/")
+        ? to
+        : resolveRelativePathname(location.pathname, to);
+      const state = {
+        index,
+      };
+      return {
+        index,
+        href: origin + pathname,
+        search: {},
+        state,
+        pathname,
+      };
+    },
+    [currentLocationIndex, location]
+  );
 
   // Transition helper
   const transitionTo = (
