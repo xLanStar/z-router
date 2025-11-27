@@ -15,6 +15,7 @@ export interface ParsedRoute extends Route {
 
 export interface Location {
   index: number;
+  href: string;
   pathname: string;
   search: Record<string, string>;
   state: Record<string, any>;

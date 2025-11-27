@@ -58,6 +58,7 @@ export const RouterProvider = ({
     };
     return {
       index,
+      href: origin + pathname,
       search: {},
       state,
       pathname,

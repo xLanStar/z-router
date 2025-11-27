@@ -115,13 +115,18 @@ export const buildPathnameFromMatches = (matches: Route[]): string => {
   return "/" + cleanedPathnames.join("/");
 };
 
-export const parseLocation = (location: globalThis.Location): Location => ({
+export const parseLocation = ({
+  href,
+  pathname,
+  search,
+}: globalThis.Location): Location => ({
   index: 0,
+  href,
   state: {
     index: 0,
   },
-  pathname: location.pathname,
-  search: Object.fromEntries(new URLSearchParams(location.search)),
+  pathname,
+  search: Object.fromEntries(new URLSearchParams(search)),
 });
 
 export const createRouterOptions = (
