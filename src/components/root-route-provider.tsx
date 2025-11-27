@@ -32,7 +32,7 @@ export const RootRouteProvider = ({
 
   return (
     <RootRouteContext.Provider
-      value={{ ...parsedRoute, getRouteState, setRouteState }}
+      value={{ ...parsedRoute, state, getRouteState, setRouteState }}
       {...props}
     />
   );
