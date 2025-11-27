@@ -14,7 +14,7 @@ export const RouteProvider = ({
     return <RouteContext.Provider value={null} {...props} />;
   }
 
-  const { getRouteState, setRouteState } = useRootRoute();
+  const { state, getRouteState, setRouteState } = useRootRoute();
 
   const getState = useCallback(
     (key: string) => getRouteState(route.id, key),
@@ -30,7 +30,7 @@ export const RouteProvider = ({
 
   return (
     <RouteContext.Provider
-      value={{ ...route, getState, setState }}
+      value={{ ...route, state: state[route.id], getState, setState }}
       {...props}
     />
   );
