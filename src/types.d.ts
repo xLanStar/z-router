@@ -1,5 +1,3 @@
-import type { TransitionType } from "./constants.ts";
-
 export interface Route {
   name?: string;
   pathname?: string;
