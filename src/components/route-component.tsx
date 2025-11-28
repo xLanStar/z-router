@@ -30,7 +30,7 @@ export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
       route
         .beforeLoad({ location })
         .catch(({ cause }: Error) => {
-          if ("to" in (cause as any)) {
+          if (!!cause && "to" in (cause as any)) {
             router.navigate(cause as any);
           }
         })
