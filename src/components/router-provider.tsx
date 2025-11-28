@@ -8,6 +8,7 @@ import type {
   NavigateActionOptions,
   NavigationOptions,
   RouterOptions,
+  TransitionType,
 } from "@/types.js";
 import { parseLocation, resolveRelativePathname } from "@/utils.js";
 import { LocationProvider } from "./location-provider.js";
@@ -25,9 +26,10 @@ export const RouterProvider = ({
   const [currentLocationIndex, setCurrentLocationIndex] = useState<number>(0);
   const location = history.at(currentLocationIndex)!;
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
-  const [transitionDuration, setTransitionDuration] = useState<number>(0);
   const [transitioningToLocation, setTransitioningToLocation] =
     useState<Location>();
+  const [transitionType, setTransitionType] = useState<TransitionType>();
+  const [transitionDuration, setTransitionDuration] = useState<number>(0);
 
   useEffect(() => {
     window.history.replaceState(location.state, "", location.pathname);
@@ -71,14 +73,17 @@ export const RouterProvider = ({
   // Transition helper
   const transitionTo = (
     location: Location,
+    transitionType: TransitionType,
     duration: number = options.defaultTransitionDuration,
     callback?: () => void
   ) => {
     setIsTransitioning(true);
+    setTransitionType(transitionType);
     setTransitionDuration(duration);
     setTransitioningToLocation(location);
     setTimeout(() => {
       setIsTransitioning(false);
+      setTransitionType(undefined);
       setTransitioningToLocation(undefined);
       callback?.();
     }, duration);
@@ -89,7 +94,7 @@ export const RouterProvider = ({
     ({
       to,
       replace,
-      transition,
+      transitionType = "slide-left",
       duration,
       onFinish,
     }: NavigateActionOptions) => {
@@ -121,8 +126,11 @@ export const RouterProvider = ({
         onFinish?.();
       };
 
-      if (transition ?? options.defaultUseTransition?.(location, newLocation)) {
-        transitionTo(newLocation, duration, updateHistory);
+      const finalTransitionType =
+        transitionType ??
+        options.defaultTransitionType?.(location, newLocation);
+      if (finalTransitionType) {
+        transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
         updateHistory();
       }
@@ -131,21 +139,27 @@ export const RouterProvider = ({
   );
 
   const back = useCallback(
-    ({ transition, duration, onFinish, depth }: BackActionOptions = {}) => {
+    ({
+      transitionType = "slide-right",
+      duration,
+      onFinish,
+      depth,
+    }: BackActionOptions = {}) => {
       if (currentLocationIndex === 0 || isTransitioning) return;
       const backDepth = depth ?? 1;
       const newLocation = history.at(currentLocationIndex - backDepth);
+      if (!newLocation) return;
 
       const updateHistory = () => {
         window.history.go(-backDepth);
         onFinish?.();
       };
 
-      if (
-        newLocation &&
-        (transition ?? options.defaultUseTransition?.(location, newLocation))
-      ) {
-        transitionTo(newLocation, duration, updateHistory);
+      const finalTransitionType =
+        transitionType ??
+        options.defaultTransitionType?.(location, newLocation);
+      if (finalTransitionType) {
+        transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
         updateHistory();
       }
@@ -154,21 +168,27 @@ export const RouterProvider = ({
   );
 
   const forward = useCallback(
-    ({ transition, duration, depth, onFinish }: ForwardActionOptions = {}) => {
+    ({
+      transitionType = "slide-left",
+      duration,
+      depth,
+      onFinish,
+    }: ForwardActionOptions = {}) => {
       if (currentLocationIndex + 1 >= history.length || isTransitioning) return;
       const forwardDepth = depth ?? 1;
       const newLocation = history.at(currentLocationIndex + forwardDepth);
+      if (!newLocation) return;
 
       const updateHistory = () => {
         window.history.go(forwardDepth);
         onFinish?.();
       };
+      const finalTransitionType =
+        transitionType ??
+        options.defaultTransitionType?.(location, newLocation);
 
-      if (
-        newLocation &&
-        (transition ?? options.defaultUseTransition?.(location, newLocation))
-      ) {
-        transitionTo(newLocation, duration, updateHistory);
+      if (finalTransitionType) {
+        transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
         updateHistory();
       }
@@ -203,8 +223,9 @@ export const RouterProvider = ({
         canGoForward: currentLocationIndex < history.length - 1,
 
         isTransitioning,
-        transitionDuration,
         transitioningToLocation,
+        transitionType,
+        transitionDuration,
 
         buildLocation,
 

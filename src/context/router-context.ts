@@ -7,6 +7,7 @@ import type {
   NavigateActionOptions,
   NavigationOptions,
   RouterOptions,
+  TransitionType,
 } from "@/types.js";
 
 export interface RouterContextType {
@@ -21,8 +22,9 @@ export interface RouterContextType {
 
   // Transition state
   isTransitioning: boolean;
-  transitionDuration: number;
   transitioningToLocation?: Location;
+  transitionType?: TransitionType;
+  transitionDuration: number;
 
   // Utilities
   buildLocation: (to: NavigationOptions) => Location;

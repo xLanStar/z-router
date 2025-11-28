@@ -28,18 +28,20 @@ export interface RouteMatch {
 }
 
 export interface RouterOptions {
-  defaultUseTransition: (
-    fromLocation: Location | undefined,
-    toLocation: Location | undefined
-  ) => boolean;
+  defaultTransitionType: (
+    fromLocation: Location,
+    toLocation: Location
+  ) => TransitionType;
   /**
    * @default 300
    */
   defaultTransitionDuration: number;
 }
 
+export type TransitionType = "slide-left" | "slide-right";
+
 export interface TransitionOptions {
-  transition?: boolean;
+  transitionType?: TransitionType;
   duration?: number;
   onFinish?: () => void;
 }

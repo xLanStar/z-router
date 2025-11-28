@@ -17,6 +17,7 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
     canGoForward,
     isTransitioning,
     transitioningToLocation,
+    transitionType,
     transitionDuration,
     back,
     forward,
@@ -110,6 +111,15 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
     transitionDuration,
   ]);
 
+  console.log(
+    "Stack",
+    currentLocationIndex >= 1 &&
+      ((isDragging && draggedRight) ||
+        (isTransitioning && transitionType === "slide-right")),
+    (isDragging && draggedLeft) ||
+      (isTransitioning && transitionType === "slide-left")
+  );
+
   return (
     <div
       style={{
@@ -119,21 +129,26 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
       }}
       {...props}
     >
-      {currentLocationIndex >= 1 &&
-        ((isDragging && draggedRight) ||
-          (isTransitioning &&
-            transitioningToLocation!.index < currentLocationIndex)) && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-            }}
+      {((isTransitioning && transitionType === "slide-right") ||
+        (isDragging && draggedRight)) && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: -1,
+          }}
+        >
+          <LocationProvider
+            location={
+              isTransitioning
+                ? transitioningToLocation!
+                : history.at(currentLocationIndex - 1)!
+            }
           >
-            <LocationProvider location={history.at(currentLocationIndex - 1)!}>
-              <PageRenderer key={currentLocationIndex - 1} />
-            </LocationProvider>
-          </div>
-        )}
+            <PageRenderer key={currentLocationIndex - 1} />
+          </LocationProvider>
+        </div>
+      )}
       <div
         key={currentLocationIndex}
         style={{
@@ -141,16 +156,13 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
           position: "absolute",
           inset: 0,
           transform:
-            isTransitioning &&
-            transitioningToLocation!.index < currentLocationIndex
+            isTransitioning && transitionType === "slide-right"
               ? `translateX(100%)`
               : isDragging && dragOffset > 0 && !isCanceling
               ? `translateX(${dragOffset}px)`
               : "translateX(0px)",
           transition:
-            isCanceling ||
-            (isTransitioning &&
-              transitioningToLocation!.index < currentLocationIndex)
+            isCanceling || (isTransitioning && transitionType === "slide-right")
               ? `transform ${transitionDuration}ms ease-out`
               : "",
         }}
@@ -160,10 +172,8 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
       >
         <PageRenderer />
       </div>
-
-      {((isDragging && draggedLeft) ||
-        (isTransitioning &&
-          currentLocationIndex <= transitioningToLocation!.index)) && (
+      {((isTransitioning && transitionType === "slide-left") ||
+        (isDragging && draggedLeft)) && (
         <div
           style={{
             background: "white",

@@ -6,7 +6,7 @@ export type LinkProps = React.ComponentPropsWithoutRef<"a"> &
   NavigateActionOptions;
 
 export const Link: React.FC<LinkProps> = memo(
-  ({ to, replace, transition, duration, onFinish, ...props }) => {
+  ({ to, replace, transitionType, duration, onFinish, ...props }) => {
     const router = useRouter();
     return (
       <a
@@ -14,7 +14,13 @@ export const Link: React.FC<LinkProps> = memo(
         href={to}
         onClick={(e) => {
           e.preventDefault();
-          router.navigate({ to, replace, transition, duration, onFinish });
+          router.navigate({
+            to,
+            replace,
+            transitionType,
+            duration,
+            onFinish,
+          });
         }}
       />
     );
