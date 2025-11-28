@@ -1,3 +1,5 @@
+import type { TransitionType } from "./constants.ts";
+
 export interface Route {
   name?: string;
   pathname?: string;
@@ -28,7 +30,7 @@ export interface RouteMatch {
 }
 
 export interface RouterOptions {
-  defaultTransitionType: (
+  defaultTransitionType?: (
     fromLocation: Location,
     toLocation: Location
   ) => TransitionType;
@@ -38,7 +40,7 @@ export interface RouterOptions {
   defaultTransitionDuration: number;
 }
 
-export type TransitionType = "slide-left" | "slide-right";
+export type TransitionType = "slide-left" | "slide-right" | "none" | undefined;
 
 export interface TransitionOptions {
   transitionType?: TransitionType;
