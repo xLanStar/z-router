@@ -94,7 +94,7 @@ export const RouterProvider = ({
     ({
       to,
       replace,
-      transitionType = "slide-left",
+      transitionType,
       duration,
       onFinish,
     }: NavigateActionOptions) => {
@@ -128,7 +128,8 @@ export const RouterProvider = ({
 
       const finalTransitionType =
         transitionType ??
-        options.defaultTransitionType?.(location, newLocation);
+        options.defaultTransitionType?.(location, newLocation) ??
+        "slide-left";
       if (finalTransitionType) {
         transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
@@ -139,12 +140,7 @@ export const RouterProvider = ({
   );
 
   const back = useCallback(
-    ({
-      transitionType = "slide-right",
-      duration,
-      onFinish,
-      depth,
-    }: BackActionOptions = {}) => {
+    ({ transitionType, duration, onFinish, depth }: BackActionOptions = {}) => {
       if (currentLocationIndex === 0 || isTransitioning) return;
       const backDepth = depth ?? 1;
       const newLocation = history.at(currentLocationIndex - backDepth);
@@ -157,7 +153,8 @@ export const RouterProvider = ({
 
       const finalTransitionType =
         transitionType ??
-        options.defaultTransitionType?.(location, newLocation);
+        options.defaultTransitionType?.(location, newLocation) ??
+        "slide-right";
       if (finalTransitionType) {
         transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
@@ -169,7 +166,7 @@ export const RouterProvider = ({
 
   const forward = useCallback(
     ({
-      transitionType = "slide-left",
+      transitionType,
       duration,
       depth,
       onFinish,
@@ -185,8 +182,8 @@ export const RouterProvider = ({
       };
       const finalTransitionType =
         transitionType ??
-        options.defaultTransitionType?.(location, newLocation);
-
+        options.defaultTransitionType?.(location, newLocation) ??
+        "slide-left";
       if (finalTransitionType) {
         transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
