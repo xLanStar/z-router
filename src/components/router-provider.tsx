@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { RouterContext } from "@/context/router-context.js";
 import type {
@@ -24,12 +24,19 @@ export const RouterProvider = ({
     parseLocation(window.location),
   ]);
   const [currentLocationIndex, setCurrentLocationIndex] = useState<number>(0);
-  const location = history.at(currentLocationIndex)!;
+  const location = useMemo(
+    () => history.at(currentLocationIndex)!,
+    [history, currentLocationIndex]
+  );
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [transitioningToLocation, setTransitioningToLocation] =
     useState<Location>();
   const [transitionType, setTransitionType] = useState<TransitionType>();
   const [transitionDuration, setTransitionDuration] = useState<number>(0);
+
+  const canGoBack = !isTransitioning && currentLocationIndex > 0;
+  const canGoForward =
+    !isTransitioning && currentLocationIndex + 1 < history.length;
 
   useEffect(() => {
     window.history.replaceState(location.state, "", location.pathname);
@@ -141,7 +148,7 @@ export const RouterProvider = ({
 
   const back = useCallback(
     ({ transitionType, duration, onFinish, depth }: BackActionOptions = {}) => {
-      if (currentLocationIndex === 0 || isTransitioning) return;
+      if (!canGoBack) return;
       const backDepth = depth ?? 1;
       const newLocation = history.at(currentLocationIndex - backDepth);
       if (!newLocation) return;
@@ -171,7 +178,7 @@ export const RouterProvider = ({
       depth,
       onFinish,
     }: ForwardActionOptions = {}) => {
-      if (currentLocationIndex + 1 >= history.length || isTransitioning) return;
+      if (!canGoForward) return;
       const forwardDepth = depth ?? 1;
       const newLocation = history.at(currentLocationIndex + forwardDepth);
       if (!newLocation) return;
@@ -216,8 +223,8 @@ export const RouterProvider = ({
 
         history,
         location,
-        canGoBack: currentLocationIndex > 0,
-        canGoForward: currentLocationIndex < history.length - 1,
+        canGoBack,
+        canGoForward,
 
         isTransitioning,
         transitioningToLocation,

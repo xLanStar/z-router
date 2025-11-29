@@ -38,8 +38,10 @@ export const LocationProvider = memo(
       <LocationContext.Provider
         value={{
           ...location,
-          canGoBack: location.index > 0,
-          canGoForward: location.index < router.history.length - 1,
+          canGoBack: !router.isTransitioning && location.index > 0,
+          canGoForward:
+            !router.isTransitioning &&
+            location.index + 1 < router.history.length,
           getState,
           setState,
           deleteState,

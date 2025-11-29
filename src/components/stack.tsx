@@ -208,11 +208,11 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
 };
 
 export interface StackProps extends StackComponentProps {
-  rootRoute: Route;
+  route: Route;
 }
 
-export const Stack: React.FC<StackProps> = ({ rootRoute, ...props }) => (
-  <RootRouteProvider rootRoute={rootRoute}>
+export const Stack: React.FC<StackProps> = ({ route, ...props }) => (
+  <RootRouteProvider route={route}>
     <StackComponent {...props} />
   </RootRouteProvider>
 );
