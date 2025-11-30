@@ -111,15 +111,6 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
     transitionDuration,
   ]);
 
-  console.log(
-    "Stack",
-    currentLocationIndex >= 1 &&
-      ((isDragging && draggedRight) ||
-        (isTransitioning && transitionType === "slide-right")),
-    (isDragging && draggedLeft) ||
-      (isTransitioning && transitionType === "slide-left")
-  );
-
   return (
     <div
       style={{
