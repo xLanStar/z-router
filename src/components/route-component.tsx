@@ -18,7 +18,7 @@ export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
   );
 
   useEffect(() => {
-    if (!route || depth >= routeMatch.matches.length) {
+    if (!route) {
       return;
     }
     if (
