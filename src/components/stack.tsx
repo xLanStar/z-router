@@ -7,9 +7,18 @@ import { LocationProvider } from "./location-provider.js";
 import { PageRenderer } from "./page-renderer.js";
 import { RootRouteProvider } from "./root-route-provider.js";
 
-type StackComponentProps = React.ComponentPropsWithoutRef<"div">;
+export interface StackComponentProps
+  extends React.ComponentPropsWithoutRef<"div"> {
+  allowSwipeForward?: boolean;
+  allowSwipeBack?: boolean;
+}
 
-const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
+const StackComponent: React.FC<StackComponentProps> = ({
+  allowSwipeBack = true,
+  allowSwipeForward = true,
+  style,
+  ...props
+}) => {
   const {
     history,
     location,
@@ -79,8 +88,8 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
       setDragOffset(0);
       return;
     }
-    if (!draggedLeft && offset < 0) setDraggedLeft(true);
-    if (!draggedRight && offset > 0) setDraggedRight(true);
+    if (!draggedLeft && offset < 0 && allowSwipeForward) setDraggedLeft(true);
+    if (!draggedRight && offset > 0 && allowSwipeBack) setDraggedRight(true);
     setDragOffset(
       Math.max(Math.min(offset, window.innerWidth), -window.innerWidth)
     );
@@ -93,9 +102,13 @@ const StackComponent: React.FC<StackComponentProps> = ({ style, ...props }) => {
     const options = {
       onFinish: reset,
     };
-    if (dragOffset > innerWidth * 0.3 && canGoBack) {
+    if (dragOffset > innerWidth * 0.3 && canGoBack && allowSwipeBack) {
       back(options);
-    } else if (dragOffset < -innerWidth * 0.3 && canGoForward) {
+    } else if (
+      dragOffset < -innerWidth * 0.3 &&
+      canGoForward &&
+      allowSwipeForward
+    ) {
       forward(options);
     } else {
       setIsCanceling(true);
