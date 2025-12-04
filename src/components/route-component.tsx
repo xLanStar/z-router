@@ -2,7 +2,7 @@ import { useLocation } from "@/hooks/useLocation.js";
 import { useRoute } from "@/hooks/useRoute.js";
 import { useRouteMatch } from "@/hooks/useRouteMatch.js";
 import { useRouter } from "@/hooks/useRouter.js";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Outlet } from "./outlet.js";
 
 export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
@@ -12,31 +12,30 @@ export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
   const route = useRoute();
 
   const pendingStateKey = `_Z.${route.id}.pending`;
-
-  const [pending, setPending] = useState(
-    !!route?.beforeLoad && route?.getState(pendingStateKey) !== false
-  );
+  const pending =
+    !!route.beforeLoad && route.getState(pendingStateKey) !== false;
 
   useEffect(() => {
     if (!route) {
       return;
     }
-    if (
-      pending &&
-      route?.beforeLoad &&
-      route.getState(pendingStateKey) !== true
-    ) {
+    if (route.beforeLoad && route.getState(pendingStateKey) === undefined) {
       route.setState(pendingStateKey, true);
       route
-        .beforeLoad({ location })
+        .beforeLoad?.({ location })
+        .then(() => route.setState(pendingStateKey, false))
         .catch(({ cause }: Error) => {
           if (!!cause && "to" in (cause as any)) {
-            router.navigate(cause as any);
+            console.log("Redirecting to:", (cause as any).to);
+            router.navigate({
+              ...(cause as any),
+              onFinish: () => {
+                route.setState(pendingStateKey, false);
+              },
+            });
+          } else {
+            route.setState(pendingStateKey, false);
           }
-        })
-        .finally(() => {
-          route.setState(pendingStateKey, false);
-          setPending(false);
         });
     }
   }, [route]);
@@ -45,14 +44,14 @@ export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {
     return null;
   }
 
-  if (depth >= routeMatch.matches.length) {
-    const NotFoundComponent = route.notFoundComponent!;
-    return <NotFoundComponent />;
-  }
-
   if (pending) {
     const PendingComponent = route.pendingComponent!;
     return <PendingComponent />;
+  }
+
+  if (depth >= routeMatch.matches.length) {
+    const NotFoundComponent = route.notFoundComponent!;
+    return <NotFoundComponent />;
   }
 
   const Component = route.component;
