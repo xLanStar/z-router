@@ -35,7 +35,12 @@ export interface RouterContextType {
   forward: (options?: ForwardActionOptions) => void;
 
   // Low-level state action
-  setLocationState: (index: number, state: Record<string, any>) => void;
+  setLocationState: (
+    index: number,
+    state:
+      | Record<string, any>
+      | ((prev: Record<string, any>) => Record<string, any>)
+  ) => void;
 }
 
 export const RouterContext = createContext<RouterContextType | null>(null);

@@ -20,17 +20,19 @@ export const LocationProvider = memo(
     );
     const setState = useCallback(
       (key: string, value: any) => {
-        router.setLocationState(location.index, {
-          ...location.state,
+        router.setLocationState(location.index, (prev) => ({
+          ...prev,
           [key]: value,
-        });
+        }));
       },
       [router, location]
     );
     const deleteState = useCallback(
       (key: string) => {
-        delete location.state[key];
-        router.setLocationState(location.index, location.state);
+        router.setLocationState(location.index, (prev) => {
+          delete prev[key];
+          return prev;
+        });
       },
       [router, location]
     );

@@ -202,15 +202,25 @@ export const RouterProvider = ({
 
   // Low-level state action
   const setLocationState = useCallback(
-    (index: number, state: Record<string, any>) => {
+    (
+      index: number,
+      state:
+        | Record<string, any>
+        | ((prev: Record<string, any>) => Record<string, any>)
+    ) => {
       setHistory((prevHistory) =>
-        prevHistory.map((location) =>
-          location.index === index ? { ...location, state } : location
-        )
+        prevHistory.map((location) => {
+          if (location.index !== index) {
+            return location;
+          }
+          const newState =
+            typeof state === "function" ? state(location.state) : state;
+          if (index === currentLocationIndex) {
+            window.history.replaceState(newState, "", location.pathname);
+          }
+          return { ...location, state: newState };
+        })
       );
-      if (index === currentLocationIndex) {
-        window.history.replaceState(state, "", location.pathname);
-      }
     },
     [currentLocationIndex]
   );
