@@ -10,7 +10,11 @@ import type {
   RouterOptions,
   TransitionType,
 } from "@/types.js";
-import { parseLocation, resolveRelativePathname } from "@/utils.js";
+import {
+  buildUrlFromLocation,
+  parseLocation,
+  resolveRelativePathname,
+} from "@/utils.js";
 import { LocationProvider } from "./location-provider.js";
 
 export const RouterProvider = ({
@@ -39,7 +43,11 @@ export const RouterProvider = ({
     !isTransitioning && currentLocationIndex + 1 < history.length;
 
   useEffect(() => {
-    window.history.replaceState(location.state, "", location.pathname);
+    window.history.replaceState(
+      location.state,
+      "",
+      buildUrlFromLocation(location)
+    );
   }, []);
 
   useEffect(() => {
@@ -120,7 +128,7 @@ export const RouterProvider = ({
           window.history.replaceState(
             newLocation.state,
             "",
-            newLocation.pathname
+            buildUrlFromLocation(newLocation)
           );
         } else {
           setHistory((prevHistory) => [
@@ -128,7 +136,11 @@ export const RouterProvider = ({
             newLocation,
           ]);
           setCurrentLocationIndex(index);
-          window.history.pushState(newLocation.state, "", newLocation.pathname);
+          window.history.pushState(
+            newLocation.state,
+            "",
+            buildUrlFromLocation(newLocation)
+          );
         }
         onFinish?.();
       };
@@ -216,7 +228,11 @@ export const RouterProvider = ({
           const newState =
             typeof state === "function" ? state(location.state) : state;
           if (index === currentLocationIndex) {
-            window.history.replaceState(newState, "", location.pathname);
+            window.history.replaceState(
+              newState,
+              "",
+              buildUrlFromLocation(location)
+            );
           }
           return { ...location, state: newState };
         })

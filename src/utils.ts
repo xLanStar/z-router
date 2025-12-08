@@ -181,3 +181,10 @@ export const resolveRelativePathname = (
   }
   return "/" + currentPathSegments.join("/");
 };
+
+export const buildUrlFromLocation = (location: Location): string => {
+  const searchParams = new URLSearchParams(location.search).toString();
+  return searchParams
+    ? `${location.pathname}?${searchParams}`
+    : location.pathname;
+};
