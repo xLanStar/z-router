@@ -8,6 +8,7 @@ export interface LocationContextType extends Location {
   getState: (key: string) => any;
   setState: (key: string, value: any) => void;
   deleteState: (key: string) => void;
+  setSearch: (key: string, value: string) => void;
 }
 
 export const LocationContext = createContext<LocationContextType | null>(null);

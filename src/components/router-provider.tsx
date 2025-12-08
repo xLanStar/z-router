@@ -227,18 +227,45 @@ export const RouterProvider = ({
           }
           const newState =
             typeof state === "function" ? state(location.state) : state;
+          const newLocation = { ...location, state: newState };
           if (index === currentLocationIndex) {
             window.history.replaceState(
               newState,
               "",
-              buildUrlFromLocation(location)
+              buildUrlFromLocation(newLocation)
             );
           }
-          return { ...location, state: newState };
+          return newLocation;
         })
       );
     },
     [currentLocationIndex]
+  );
+
+  const setLocationSearch = useCallback(
+    (locationIndex: number, search: Record<string, string>) => {
+      setHistory((prev) =>
+        prev.map((location) => {
+          if (location.index !== locationIndex) return location;
+          const newLocation = {
+            ...location,
+            search: {
+              ...location.search,
+              ...search,
+            },
+          };
+          if (locationIndex === currentLocationIndex) {
+            window.history.replaceState(
+              newLocation.state,
+              "",
+              buildUrlFromLocation(newLocation)
+            );
+          }
+          return newLocation;
+        })
+      );
+    },
+    []
   );
 
   return (
@@ -264,6 +291,7 @@ export const RouterProvider = ({
         forward,
 
         setLocationState,
+        setLocationSearch,
       }}
     >
       <LocationProvider location={location} {...props} />

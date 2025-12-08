@@ -36,6 +36,15 @@ export const LocationProvider = memo(
       },
       [router, location]
     );
+    const setSearch = useCallback(
+      (key: string, value: string) => {
+        router.setLocationSearch(location.index, {
+          ...location.search,
+          [key]: value,
+        });
+      },
+      [router, location]
+    );
     return (
       <LocationContext.Provider
         value={{
@@ -47,6 +56,7 @@ export const LocationProvider = memo(
           getState,
           setState,
           deleteState,
+          setSearch,
         }}
         {...props}
       />

@@ -41,6 +41,10 @@ export interface RouterContextType {
       | Record<string, any>
       | ((prev: Record<string, any>) => Record<string, any>)
   ) => void;
+  setLocationSearch: (
+    locationIndex: number,
+    search: Record<string, string>
+  ) => void;
 }
 
 export const RouterContext = createContext<RouterContextType | null>(null);
