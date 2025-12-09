@@ -13,7 +13,7 @@ import type {
 import {
   buildUrlFromLocation,
   parseLocation,
-  resolveRelativePathname,
+  resolveRelativeUrl,
 } from "@/utils.js";
 import { LocationProvider } from "./location-provider.js";
 
@@ -68,16 +68,18 @@ export const RouterProvider = ({
       const index = replace ? currentLocationIndex : currentLocationIndex + 1;
 
       // Resolve to with absolute or relative paths like ".." or "."
-      const pathname = to.startsWith("/")
+      const url = to.startsWith("/")
         ? to
-        : resolveRelativePathname(location.pathname, to);
+        : resolveRelativeUrl(location.pathname, to);
+      const [pathname, search] = url.split("?");
+      const searchParams = new URLSearchParams(search ?? "");
       const state = {
         index,
       };
       return {
         index,
-        href: origin + pathname,
-        search: {},
+        href: origin + pathname + (search ? `?${searchParams.toString()}` : ""),
+        search: Object.fromEntries(searchParams.entries()),
         state,
         pathname,
       };

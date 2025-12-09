@@ -159,16 +159,13 @@ export const parseRoute = (route: Route): ParsedRoute => {
 const isPathSegmentValid = (segment: string): boolean => segment.length > 0;
 
 /**
- * Resolves a relative path against a base pathname.
- * @param pathname The base pathname.
+ * Resolves a relative path against a base url.
+ * @param url The base url.
  * @param to The relative path to resolve.
- * @returns The resolved absolute pathname.
+ * @returns The resolved absolute url.
  */
-export const resolveRelativePathname = (
-  pathname: string,
-  to: string
-): string => {
-  const currentPathSegments = pathname.split("/").filter(isPathSegmentValid);
+export const resolveRelativeUrl = (url: string, to: string): string => {
+  const currentPathSegments = url.split("/").filter(isPathSegmentValid);
   const toPathSegments = to.split("/").filter(isPathSegmentValid);
   for (const segment of toPathSegments) {
     if (segment === ".") {
