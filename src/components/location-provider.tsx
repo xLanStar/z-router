@@ -1,7 +1,7 @@
 import { LocationContext } from "@/context/location-context.js";
 import { useRouter } from "@/hooks/useRouter.js";
 import type { Location } from "@/types.js";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 
 export const LocationProvider = memo(
   ({
@@ -12,12 +12,7 @@ export const LocationProvider = memo(
     children: React.ReactNode;
   }) => {
     const router = useRouter();
-    const getState = useCallback(
-      (key: string) => {
-        return location.state[key];
-      },
-      [location]
-    );
+    const state = useMemo(() => location.state, [location]);
     const setState = useCallback(
       (key: string, value: any) => {
         router.setLocationState(location.index, (prev) => ({
@@ -53,7 +48,7 @@ export const LocationProvider = memo(
           canGoForward:
             !router.isTransitioning &&
             location.index + 1 < router.history.length,
-          getState,
+          state,
           setState,
           deleteState,
           setSearch,
