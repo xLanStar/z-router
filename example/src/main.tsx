@@ -4,7 +4,8 @@ import { App } from "./app/app";
 import { HeroUIProvider } from "./components/heroUIProvider";
 
 const router = createRouterOptions({
-  defaultUseTransition: () => true,
+  defaultTransitionType: (from, to) =>
+    from?.index <= to?.index ? "slide-left" : "slide-right",
   defaultTransitionDuration: 300,
 });
 

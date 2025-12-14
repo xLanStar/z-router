@@ -6,6 +6,8 @@ export const SettingsPage = () => {
   const rootRoute = useRootRoute();
   const route = useRoute();
 
+  console.log("SettingsPage Rendered");
+
   return (
     <div className="flex flex-col gap-3">
       Settings Page
@@ -34,11 +36,11 @@ export const SettingsPage = () => {
       >
         test route state {JSON.stringify(rootRoute.state)}
       </Button>
-      <Button as={Link} href="/">
-        Back to Home with absolute path (/)
+      <Button as={Link} href="/home">
+        Back to Home with absolute path (/home)
       </Button>
-      <Button as={Link} href="..">
-        Back to Home with relative path (..)
+      <Button as={Link} href="../home">
+        Back to Home with relative path (../home)
       </Button>
     </div>
   );

@@ -9,7 +9,7 @@ export const MainLayout = () => {
       <div className="flex gap-2">
         <Button
           as={Link}
-          href="/"
+          href="/home"
           color={
             routeMatch.matches.some((match) => match.name === "home-page")
               ? "primary"
