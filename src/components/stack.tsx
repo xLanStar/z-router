@@ -7,6 +7,12 @@ import { LocationProvider } from "./location-provider.js";
 import { PageRenderer } from "./page-renderer.js";
 import { RootRouteProvider } from "./root-route-provider.js";
 
+const PreviousComponentStyle = {
+  position: "absolute",
+  inset: 0,
+  zIndex: -1,
+} as const;
+
 export interface StackComponentProps
   extends React.ComponentPropsWithoutRef<"div"> {
   allowSwipeForward?: boolean;
@@ -38,8 +44,8 @@ const StackComponent: React.FC<StackComponentProps> = ({
   const startY = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
-  const [draggedLeft, setDraggedLeft] = useState(false);
-  const [draggedRight, setDraggedRight] = useState(false);
+  const [showPreviousComponent, setShowPreviousComponent] = useState(false);
+  const [showNextComponent, setShowNextComponent] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isTransitionStarted, setIsTransitionStarted] = useState(false);
 
@@ -56,44 +62,60 @@ const StackComponent: React.FC<StackComponentProps> = ({
   const reset = () => {
     setIsDragging(false);
     setDragOffset(0);
-    setDraggedLeft(false);
-    setDraggedRight(false);
+    setShowPreviousComponent(false);
+    setShowNextComponent(false);
     setIsCanceling(false);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (isTransitioning || (!canGoForward && !canGoBack)) return;
-    isTouching.current = true;
-    startX.current = e.touches[0].clientX;
-    startY.current = e.touches[0].clientY;
-  };
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (isTransitioning || (!canGoForward && !canGoBack)) return;
+      isTouching.current = true;
+      startX.current = e.touches[0].clientX;
+      startY.current = e.touches[0].clientY;
+    },
+    [isTransitioning, canGoBack, canGoForward]
+  );
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isTouching.current) return;
-    // Skip vertical drag
-    const { clientX, clientY } = e.touches[0];
-    if (!isDragging && Math.abs(clientY - startY.current) > 30) {
-      isTouching.current = false;
-      return;
-    }
-    const offset = clientX - startX.current;
-    if (Math.abs(offset) < 10) return;
-    if (!isDragging) {
-      setIsDragging(true);
-    }
-    if (
-      (offset > 0 && currentLocationIndex === 0) ||
-      (offset < 0 && currentLocationIndex + 1 === history.length)
-    ) {
-      setDragOffset(0);
-      return;
-    }
-    if (!draggedLeft && offset < 0 && allowSwipeForward) setDraggedLeft(true);
-    if (!draggedRight && offset > 0 && allowSwipeBack) setDraggedRight(true);
-    setDragOffset(
-      Math.max(Math.min(offset, window.innerWidth), -window.innerWidth)
-    );
-  };
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (!isTouching.current) return;
+      // Skip vertical drag
+      const { clientX, clientY } = e.touches[0];
+      if (!isDragging && Math.abs(clientY - startY.current) > 30) {
+        isTouching.current = false;
+        return;
+      }
+      const offset = clientX - startX.current;
+      if (Math.abs(offset) < 10) return;
+      if (!isDragging) {
+        setIsDragging(true);
+      }
+      if (
+        (offset > 0 && currentLocationIndex === 0) ||
+        (offset < 0 && currentLocationIndex + 1 === history.length)
+      ) {
+        setDragOffset(0);
+        return;
+      }
+      if (!showPreviousComponent && offset < 0 && allowSwipeForward)
+        setShowPreviousComponent(true);
+      if (!showNextComponent && offset > 0 && allowSwipeBack)
+        setShowNextComponent(true);
+      setDragOffset(
+        Math.max(Math.min(offset, window.innerWidth), -window.innerWidth)
+      );
+    },
+    [
+      isDragging,
+      currentLocationIndex,
+      history.length,
+      showPreviousComponent,
+      showNextComponent,
+      allowSwipeBack,
+      allowSwipeForward,
+    ]
+  );
 
   const handleTouchEnd = useCallback(() => {
     isTouching.current = false;
@@ -134,14 +156,8 @@ const StackComponent: React.FC<StackComponentProps> = ({
       {...props}
     >
       {((isTransitioning && transitionType === "slide-right") ||
-        (isDragging && draggedRight)) && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: -1,
-          }}
-        >
+        (isDragging && showNextComponent)) && (
+        <div style={PreviousComponentStyle}>
           <LocationProvider
             location={
               isTransitioning
@@ -177,7 +193,7 @@ const StackComponent: React.FC<StackComponentProps> = ({
         <PageRenderer />
       </div>
       {((isTransitioning && transitionType === "slide-left") ||
-        (isDragging && draggedLeft)) && (
+        (isDragging && showPreviousComponent)) && (
         <div
           style={{
             background: "white",
