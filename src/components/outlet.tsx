@@ -1,5 +1,5 @@
-import { useOutlet } from "@/hooks/useOutlet.js";
-import { useRouteMatch } from "@/hooks/useRouteMatch.js";
+import { useOutlet } from "../hooks/useOutlet.js";
+import { useRouteMatch } from "../hooks/useRouteMatch.js";
 import { OutletProvider } from "./outlet-provider.js";
 import { RouteComponent } from "./route-component.js";
 import { RouteProvider } from "./route-provider.js";

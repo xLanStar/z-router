@@ -1,7 +1,7 @@
-import { LocationContext } from "@/context/location-context.js";
-import { useRouter } from "@/hooks/useRouter.js";
-import type { Location } from "@/types.js";
 import { memo, useCallback, useMemo } from "react";
+import { LocationContext } from "../context/location-context.js";
+import { useRouter } from "../hooks/useRouter.js";
+import type { Location } from "../types.js";
 
 export const LocationProvider = memo(
   ({

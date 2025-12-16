@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { RouterContext } from "@/context/router-context.js";
+import { RouterContext } from "../context/router-context.js";
 import type {
   BackActionOptions,
   ForwardActionOptions,
@@ -9,12 +9,12 @@ import type {
   NavigationOptions,
   RouterOptions,
   TransitionType,
-} from "@/types.js";
+} from "../types.js";
 import {
   buildUrlFromLocation,
   parseLocation,
   resolveRelativeUrl,
-} from "@/utils.js";
+} from "../utils.js";
 import { LocationProvider } from "./location-provider.js";
 
 export const RouterProvider = ({

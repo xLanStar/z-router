@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { RouterContext } from "@/context/router-context.js";
+import { RouterContext } from "../context/router-context.js";
 
 export const useRouter = () => {
   const router = useContext(RouterContext);

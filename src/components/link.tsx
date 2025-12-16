@@ -1,6 +1,6 @@
-import { useRouter } from "@/hooks/useRouter.js";
-import type { NavigateActionOptions } from "@/types.js";
 import { memo } from "react";
+import { useRouter } from "../hooks/useRouter.js";
+import type { NavigateActionOptions } from "../types.js";
 
 export type LinkProps = React.ComponentPropsWithoutRef<"a"> &
   NavigateActionOptions;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useRouter } from "@/hooks/useRouter.js";
-import type { Route } from "@/types.js";
+import { useRouter } from "../hooks/useRouter.js";
+import type { Route } from "../types.js";
 
 import { LocationProvider } from "./location-provider.js";
 import { PageRenderer } from "./page-renderer.js";

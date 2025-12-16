@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { matchPattern } from "@/utils.js";
+import { matchPattern } from "../utils.js";
 
 test("Match flat URL", () => {
   expect(matchPattern("/home", "/home")).toEqual({ params: {}, query: {} });

@@ -8,7 +8,7 @@ import type {
   NavigationOptions,
   RouterOptions,
   TransitionType,
-} from "@/types.js";
+} from "../types.js";
 
 export interface RouterContextType {
   // Router Config

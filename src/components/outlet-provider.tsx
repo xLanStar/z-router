@@ -1,4 +1,4 @@
-import { OutletContext } from "@/context/outlet-context.js";
+import { OutletContext } from "../context/outlet-context.js";
 
 export const OutletProvider = ({
   depth,

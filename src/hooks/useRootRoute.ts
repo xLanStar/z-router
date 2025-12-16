@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { RootRouteContext } from "@/context/root-route-context.js";
+import { RootRouteContext } from "../context/root-route-context.js";
 
 export const useRootRoute = () => {
   const route = useContext(RootRouteContext);

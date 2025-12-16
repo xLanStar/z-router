@@ -1,5 +1,5 @@
-import type { ParsedRoute } from "@/types.js";
 import { createContext } from "react";
+import type { ParsedRoute } from "../types.js";
 
 export interface RouteContextType extends ParsedRoute {
   state: Record<string, any>;

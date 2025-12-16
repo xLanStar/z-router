@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { Location } from "@/types.js";
+import type { Location } from "../types.js";
 
 export interface LocationContextType extends Location {
   canGoBack: boolean;
