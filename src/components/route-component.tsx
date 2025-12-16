@@ -1,8 +1,8 @@
+import { useLocation } from "@/hooks/useLocation.js";
+import { useRoute } from "@/hooks/useRoute.js";
+import { useRouteMatch } from "@/hooks/useRouteMatch.js";
+import { useRouter } from "@/hooks/useRouter.js";
 import { useEffect } from "react";
-import { useLocation } from "../hooks/useLocation.js";
-import { useRoute } from "../hooks/useRoute.js";
-import { useRouteMatch } from "../hooks/useRouteMatch.js";
-import { useRouter } from "../hooks/useRouter.js";
 import { Outlet } from "./outlet.js";
 
 export const RouteComponent = ({ depth = 0 }: { depth?: number }) => {

@@ -1,7 +1,7 @@
+import { RouteContext } from "@/context/route-context.js";
+import { useRootRoute } from "@/hooks/useRootRoute.js";
+import type { ParsedRoute } from "@/types.js";
 import { useCallback } from "react";
-import { RouteContext } from "../context/route-context.js";
-import { useRootRoute } from "../hooks/useRootRoute.js";
-import type { ParsedRoute } from "../types.js";
 
 export const RouteProvider = ({
   route,
