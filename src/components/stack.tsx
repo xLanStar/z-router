@@ -172,7 +172,6 @@ const StackComponent: React.FC<StackComponentProps> = ({
       <div
         key={currentLocationIndex}
         style={{
-          background: "white",
           position: "absolute",
           inset: 0,
           transform:
@@ -196,7 +195,6 @@ const StackComponent: React.FC<StackComponentProps> = ({
         (isDragging && showPreviousComponent)) && (
         <div
           style={{
-            background: "white",
             position: "absolute",
             inset: 0,
             zIndex: 1,
