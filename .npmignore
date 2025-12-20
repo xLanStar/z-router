@@ -4,5 +4,9 @@ node_modules
 
 .DS_Store
 
+.vscode
+
+.oxlintrc.json
+
 tsconfig.json
 tsup.config.ts
