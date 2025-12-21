@@ -1,3 +1,5 @@
+import type { TransitionType } from "./constants.ts";
+
 export interface Route {
   name?: string;
   pathname?: string;
@@ -37,8 +39,6 @@ export interface RouterOptions {
    */
   defaultTransitionDuration: number;
 }
-
-export type TransitionType = "slide-left" | "slide-right" | "none" | undefined;
 
 export interface TransitionOptions {
   transitionType?: TransitionType;

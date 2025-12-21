@@ -14,7 +14,6 @@ export const RootRoute: Route = {
   component: RootLayout,
   children: [
     {
-      pathname: "/",
       component: MainLayout,
       children: [
         {

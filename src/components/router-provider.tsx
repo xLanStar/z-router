@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { TransitionType } from "@/constants.js";
 import { RouterContext } from "@/context/router-context.js";
 import type {
   BackActionOptions,
@@ -8,7 +9,6 @@ import type {
   NavigateActionOptions,
   NavigationOptions,
   RouterOptions,
-  TransitionType,
 } from "@/types.js";
 import {
   buildUrlFromLocation,
@@ -150,8 +150,11 @@ export const RouterProvider = ({
       const finalTransitionType =
         transitionType ??
         options.defaultTransitionType?.(location, newLocation) ??
-        "slide-left";
-      if (finalTransitionType) {
+        TransitionType.SlideLeft;
+      if (
+        finalTransitionType &&
+        finalTransitionType !== TransitionType.NoTransition
+      ) {
         transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
         updateHistory();
@@ -175,8 +178,11 @@ export const RouterProvider = ({
       const finalTransitionType =
         transitionType ??
         options.defaultTransitionType?.(location, newLocation) ??
-        "slide-right";
-      if (finalTransitionType) {
+        TransitionType.SlideRight;
+      if (
+        finalTransitionType &&
+        finalTransitionType !== TransitionType.NoTransition
+      ) {
         transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
         updateHistory();
@@ -204,8 +210,11 @@ export const RouterProvider = ({
       const finalTransitionType =
         transitionType ??
         options.defaultTransitionType?.(location, newLocation) ??
-        "slide-left";
-      if (finalTransitionType) {
+        TransitionType.SlideLeft;
+      if (
+        finalTransitionType &&
+        finalTransitionType !== TransitionType.NoTransition
+      ) {
         transitionTo(newLocation, finalTransitionType, duration, updateHistory);
       } else {
         updateHistory();

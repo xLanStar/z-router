@@ -1,11 +1,17 @@
-import { RouterProvider, createRouterOptions } from "@modastar/z-router";
+import {
+  RouterProvider,
+  TransitionType,
+  createRouterOptions,
+} from "@modastar/z-router";
 import ReactDOM from "react-dom/client";
 import { App } from "./app/app";
 import { HeroUIProvider } from "./components/heroUIProvider";
 
 const router = createRouterOptions({
   defaultTransitionType: (from, to) =>
-    from?.index <= to?.index ? "slide-left" : "slide-right",
+    from?.index <= to?.index
+      ? TransitionType.SlideLeft
+      : TransitionType.SlideRight,
   defaultTransitionDuration: 300,
 });
 

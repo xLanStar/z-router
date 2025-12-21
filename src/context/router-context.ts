@@ -1,5 +1,6 @@
 import { createContext } from "react";
 
+import type { TransitionType } from "@/constants.js";
 import type {
   BackActionOptions,
   ForwardActionOptions,
@@ -7,7 +8,6 @@ import type {
   NavigateActionOptions,
   NavigationOptions,
   RouterOptions,
-  TransitionType,
 } from "@/types.js";
 
 export interface RouterContextType {
