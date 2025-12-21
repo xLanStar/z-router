@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "@/hooks/useRouter.js";
 import type { Route } from "@/types.js";
 
+import { TransitionType } from "@/constants.js";
 import { LocationProvider } from "./location-provider.js";
 import { PageRenderer } from "./page-renderer.js";
 import { RootRouteProvider } from "./root-route-provider.js";
@@ -155,7 +156,7 @@ const StackComponent: React.FC<StackComponentProps> = ({
       }}
       {...props}
     >
-      {((isTransitioning && transitionType === "slide-right") ||
+      {((isTransitioning && transitionType === TransitionType.SlideRight) ||
         (isDragging && showNextComponent)) && (
         <div style={PreviousComponentStyle}>
           <LocationProvider
@@ -175,13 +176,14 @@ const StackComponent: React.FC<StackComponentProps> = ({
           position: "absolute",
           inset: 0,
           transform:
-            isTransitioning && transitionType === "slide-right"
+            isTransitioning && transitionType === TransitionType.SlideRight
               ? `translateX(100%)`
               : isDragging && dragOffset > 0 && !isCanceling
               ? `translateX(${dragOffset}px)`
               : "translateX(0px)",
           transition:
-            isCanceling || (isTransitioning && transitionType === "slide-right")
+            isCanceling ||
+            (isTransitioning && transitionType === TransitionType.SlideRight)
               ? `transform ${transitionDuration}ms ease-out`
               : "",
         }}
@@ -191,7 +193,7 @@ const StackComponent: React.FC<StackComponentProps> = ({
       >
         <PageRenderer />
       </div>
-      {((isTransitioning && transitionType === "slide-left") ||
+      {((isTransitioning && transitionType === TransitionType.SlideLeft) ||
         (isDragging && showPreviousComponent)) && (
         <div
           style={{
